@@ -211,7 +211,15 @@ a:hover {
     background-color: transparent;
 }
 
+.song-card-details h3,
+.song-card-details p {
+    margin: 2px;
+    /* Adjust the value to add more or less spacing */
+}
 
+.song-card-details h3 {
+    margin-top: 1.4rem;
+}
 
 /* Define the fade-in class */
 

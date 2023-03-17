@@ -45,42 +45,4 @@ document.addEventListener('DOMContentLoaded', async () => {
             window.location.href = `/songs/${genre}`;
         }
     };
-
-    // Function to handle the intersection observer events
-    function handleIntersection(entries, observer) {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                // Add the "show" class to the recommendations container when it is in view
-                $('#recommendations-container').addClass('show');
-                // Stop observing the element, since we only need to apply the effect once
-                observer.unobserve(entry.target);
-            }
-        });
-    }
-
-    // Create a new intersection observer
-    const observer = new IntersectionObserver(handleIntersection, { threshold: 0.2 });
-
-    // Observe the recommendations container element
-    observer.observe(document.querySelector('#recommendations-container'));
-
-    // Function to handle the intersection observer events for fade-in effect
-    function handleFadeIn(entries, observer) {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                // Add the "is-visible" class to the element when it is in view
-                entry.target.classList.add('is-visible');
-                // Stop observing the element, since we only need to apply the effect once
-                observer.unobserve(entry.target);
-            }
-        });
-    }
-
-    // Create a new intersection observer for fade-in effect
-    const fadeInObserver = new IntersectionObserver(handleFadeIn, { threshold: 0.2 });
-
-    // Observe all elements with the "fade-in" class
-    document.querySelectorAll('.fade-in').forEach(element => {
-        fadeInObserver.observe(element);
-    });
 });
