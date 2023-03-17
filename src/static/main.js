@@ -9,9 +9,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const counts = data.map(item => item.count);
     const maxCount = Math.max(...counts);
 
-    const gradient = chartElement.getContext('2d').createLinearGradient(0, 100, 1000, 0);
+    const gradient = chartElement.getContext('2d').createLinearGradient(0, 0, 1750, 0);
     gradient.addColorStop(0, 'rgb(20, 70, 70)');
-    gradient.addColorStop(1, 'rgb(239, 221, 141)');
+    gradient.addColorStop(0.99, 'rgb(239, 221, 141)');
 
 
     const chart = new Chart(chartElement, {
@@ -64,4 +64,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Observe the recommendations container element
     observer.observe(document.querySelector('#recommendations-container'));
 
+    // Function to handle the intersection observer events for fade-in effect
+    function handleFadeIn(entries, observer) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                // Add the "is-visible" class to the element when it is in view
+                entry.target.classList.add('is-visible');
+                // Stop observing the element, since we only need to apply the effect once
+                observer.unobserve(entry.target);
+            }
+        });
+    }
+
+    // Create a new intersection observer for fade-in effect
+    const fadeInObserver = new IntersectionObserver(handleFadeIn, { threshold: 0.2 });
+
+    // Observe all elements with the "fade-in" class
+    document.querySelectorAll('.fade-in').forEach(element => {
+        fadeInObserver.observe(element);
+    });
 });

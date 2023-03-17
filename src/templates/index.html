@@ -14,19 +14,28 @@
 </head>
 
 <body>
-    {% include 'navbar.html' %}
     <h1>Your Spotify Genetics</h1>
+    {% include 'navbar.html' %}
     <div class="chart-container">
         <div class="chart-wrapper">
             <canvas id="myChart"></canvas>
             <script src="{{ url_for('static', filename='main.js') }}"></script>
+            <div class="category-explanations" style="margin-top: 2rem;">
+                <h2>Category Explanations:</h2>
+                <ul>
+                    <li><strong>Energy:</strong> High (H) / Low (L)</li>
+                    <li><strong>Mood:</strong> Positive (P) / Negative (N)</li>
+                    <li><strong>Tempo:</strong> Fast (F) / Slow (S)</li>
+                    <li><strong>Instrumentation:</strong> Electronic (E) / Acoustic (A)</li>
+                </ul>
+            </div>
         </div>
         <div class="sidebar-container">
             <h2>Recently Played:</h2>
-            <div class="recently-played-wrapper">
+            <div class="recently-played-wrapper fade-in">
                 <div class="recently-played-cards">
                     {% for song in recentlyPlayedSongs %}
-                    <a href="{{ song.url }}" target="_blank" class="song-card">
+                    <a href="{{ song.url }}" target="_blank" class="song-card fade-in">
                         <img src="{{ song.image_url }}" alt="{{ song.name }} image" class="song-image">
                         <div class="song-card-details">
                             <h3>{{ song.name }}</h3>
@@ -38,18 +47,30 @@
 
                 </div>
             </div>
-            <div class="category-explanations">
-                <h2>Category Explanations:</h2>
-                <ul>
-                    <li><strong>Energy:</strong> High (H) / Low (L)</li>
-                    <li><strong>Mood:</strong> Positive (P) / Negative (N)</li>
-                    <li><strong>Tempo:</strong> Fast (F) / Slow (S)</li>
-                    <li><strong>Instrumentation:</strong> Electronic (E) / Acoustic (A)</li>
-                </ul>
-            </div>
+
         </div>
 
     </div>
+    <script type="text/javascript">
+        window.addEventListener('scroll', function () {
+            var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            var windowHeight = window.innerHeight;
+            var elements = document.querySelectorAll('.fade-in');
+            var distances = [];
+
+            elements.forEach(function (element) {
+                var distance = element.offsetTop;
+                distances.push(distance);
+            });
+
+            distances.forEach(function (distance, index) {
+                if (distance < scrollTop + windowHeight) {
+                    elements[index].classList.add('is-visible');
+                }
+            });
+        });
+    </script>
+
 </body>
 
 </html>

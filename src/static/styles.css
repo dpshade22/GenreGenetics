@@ -40,6 +40,7 @@ a:hover {
     align-items: flex-start;
     flex-wrap: wrap;
     margin-bottom: 1.5rem;
+    margin-top: 4rem;
 }
 
 .chart-wrapper {
@@ -60,8 +61,8 @@ a:hover {
 .sidebar-container {
     flex: 1;
     flex-basis: 30%;
-    min-width: 300px;
-    max-width: 400px;
+    min-width: 25rem;
+    max-width: 50rem;
     margin-bottom: 1.5rem;
 }
 
@@ -214,16 +215,16 @@ a:hover {
 
 /* Define the fade-in class */
 
+/* .is-visible {
+    opacity: 1;
+    transform: translate(0, 0);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
 .fade-in {
-    opacity: 1;
-    transition: opacity 0.5s ease-in-out;
-}
-
-
-.fade-in.is-visible {
-    opacity: 1;
-    transform: translateY(0);
-}
+    opacity: 0;
+    transform: translate(0, 100px);
+} */
 
 @keyframes fadeIn {
     from {
@@ -238,7 +239,6 @@ a:hover {
 }
 
 /* Headings */
-
 h1,
 h2,
 h3 {
@@ -248,8 +248,17 @@ h3 {
 
 h1 {
     font-size: 2rem;
-    margin-bottom: 1rem;
+    margin-top: 0;
+    margin-bottom: 0;
+    /* Remove the top margin */
     text-align: center;
+    background-color: var(--secondary-color);
+    /* Add the same background color as the navbar */
+    padding: 4rem;
+    padding-bottom: 0;
+    /* Add some padding to make the text look better */
+    color: white;
+    /* Change the text color to white for better contrast */
 }
 
 h2 {
@@ -367,17 +376,19 @@ tr:hover {
 
 .navbar {
     display: flex;
-    justify-content: center;
+    justify-content: left;
     align-items: center;
     background-color: var(--secondary-color);
-    padding: 0.5rem;
+    padding: 1rem;
+    padding-top: 1.4rem;
+    padding-left: 26rem;
 }
 
 .navbar-item {
     font-weight: 350;
     color: white;
     text-decoration: none;
-    margin: 0 1rem
+    margin-bottom: 0 1rem
 }
 
 .navbar-spacer {
