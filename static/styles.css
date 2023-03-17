@@ -1,0 +1,290 @@
+/* General styles */
+
+:root {
+    --primary-color: rgba(19, 69, 69, 1);
+    --secondary-color: rgba(33, 126, 126, 1);
+    --light-color: rgba(229, 229, 229, 1);
+    --dark-color: rgba(51, 51, 51, 1);
+    --font-family: 'Roboto', sans-serif;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-family);
+    color: var(--dark-color);
+}
+
+a {
+    text-decoration: none;
+    color: var(--primary-color);
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Container */
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.chart-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+
+.chart-wrapper {
+    flex: 1;
+    min-width: 300px;
+    max-width: 900px;
+    margin-right: 1rem;
+    margin-left: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.recently-played-container {
+    flex: 1;
+    min-width: 300px;
+    max-width: 400px;
+    margin-bottom: 1.5rem;
+}
+
+.recently-played {
+    list-style-type: none;
+    padding: 0;
+}
+
+.recently-played li {
+    margin-bottom: 0.5rem;
+}
+
+.recently-played a {
+    color: var(--primary-color);
+}
+
+.recently-played a:hover {
+    text-decoration: underline;
+}
+
+.category-explanations {
+    color: #777;
+}
+
+/* Headings */
+
+h1,
+h2,
+h3 {
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Text styles */
+
+p {
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+ul,
+ol {
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+li {
+    margin-bottom: 0.5rem;
+}
+
+/* Buttons */
+
+.button {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    background-color: var(--secondary-color);
+    color: white;
+    text-align: center;
+    transition: background-color 0.2s ease;
+}
+
+.button:hover {
+    background-color: darken(var(--secondary-color), 10%);
+    cursor: pointer;
+}
+
+/* Forms */
+
+input[type="text"],
+textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--light-color);
+    border-radius: 0.25rem;
+    margin-bottom: 1rem;
+    resize: none;
+}
+
+input[type="submit"] {
+    display: block;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    background-color: var(--secondary-color);
+    color: white;
+    text-align: center;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+}
+
+input[type="submit"]:hover {
+    background-color: darken(var(--secondary-color), 10%);
+}
+
+/* Tables */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+}
+
+th,
+td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--light-color);
+}
+
+th {
+    font-weight: bold;
+    background-color: var(--secondary-color);
+    color: white;
+}
+
+td {
+    font-style: italic;
+}
+
+tr:hover {
+    background-color: var(--light-color);
+}
+
+.song-row {
+    cursor: pointer;
+}
+
+.song-row:hover {
+    background-color: #f2f2f2;
+}
+
+
+
+
+/* Navbar */
+
+.navbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--secondary-color);
+    padding: 0.5rem;
+}
+
+.navbar-item {
+    font-weight: 350;
+    color: white;
+    text-decoration: none;
+    margin: 0 1rem
+}
+
+.navbar-spacer {
+    color: white;
+}
+
+/* Footer */
+
+.footer {
+    background-color: var(--secondary-color);
+    color: white;
+    text-align: center;
+    padding: 1rem;
+}
+
+
+
+/* Media queries */
+
+@media (max-width: 768px) {
+    .chart-wrapper {
+        margin-right: 0;
+    }
+
+    .container {
+        max-width: 100%;
+        padding: 0.5rem;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    h2 {
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    h3 {
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    input[type="text"],
+    textarea {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid var(--light-color);
+        border-radius: 0.25rem;
+        margin-bottom: 1rem;
+        resize: none;
+    }
+
+    .button {
+        display: block;
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+
+    .navbar {
+        flex-wrap: wrap;
+    }
+
+    .navbar-item,
+    .navbar-spacer {
+        margin: 0.5rem 0;
+    }
+}

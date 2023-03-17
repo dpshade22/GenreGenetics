@@ -1,0 +1,48 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genre Genetics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link rel="shortcut icon" type="image/vnd.microsoft.icon" href="{{ url_for('favicon') }}">
+</head>
+
+<body>
+    {% include 'navbar.html' %}
+    <h1>Your Spotify Genes</h1>
+    <div class="chart-container">
+        <div class="chart-wrapper">
+            <canvas id="myChart"></canvas>
+            <script src="{{ url_for('static', filename='main.js') }}"></script>
+        </div>
+        <div class="recently-played-container">
+            <h2>Recently Played:</h2>
+            <ul class="recently-played">
+                {% for song in recentlyPlayedSongs %}
+                <li>
+                    <a href="{{ song.url }}" target="_blank">{{ song.name }} - {{ song.artist }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+            <!-- Move Category Explanations inside the recently-played-container div -->
+            <div class="container category-explanations">
+
+                <h2>Category Explanations:</h2>
+                <ul>
+                    <li><strong>Energy:</strong> H/L (High/Low)</li>
+                    <li><strong>Mood:</strong> P/N (Positive/Negative)</li>
+                    <li><strong>Tempo:</strong> F/S (Fast/Slow)</li>
+                    <li><strong>Instrumentation:</strong> E/A (Electronic/Acoustic)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

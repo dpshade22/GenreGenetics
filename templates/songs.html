@@ -1,0 +1,55 @@
+<!-- songs.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ genre }} - Songs and Artists</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+    {% include 'navbar.html' %}
+
+    <div class="container">
+        <h1>{{ genre }}</h1>
+        {% if genre %}
+        <p><em>
+                {% for letter in genre %}
+                {% if letter in acronym_explanations %}
+                {{ acronym_explanations[letter] }}
+                {% if not loop.last %},
+                {% endif %}
+                {% endif %}
+                {% endfor %}
+            </em></p>
+        {% endif %}
+        <h2>Songs and Artists</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Song</th>
+                    <th>Artist</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for song in songs %}
+                <tr class="song-row">
+                    <td>
+                        <a href="{{ song.songLink }}" target="_blank">{{ song.name }}</a>
+                    </td>
+                    <td>
+                        <a href="{{ song.artistLink}}" target="_blank">{{ song.artists }}</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</body>
+
+</html>

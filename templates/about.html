@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+    {% include 'navbar.html' %}
+
+    <div class="container">
+        <h1>About Genre Genetics</h1>
+
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam vitae est id lectus tincidunt bibendum
+            vel nec sapien. Aliquam vitae sapien nec felis placerat hendrerit. Sed sit amet sem nibh. Donec posuere
+            purus nec semper euismod. Ut hendrerit mollis velit, a fermentum est congue id. Duis volutpat dolor vel
+            massa finibus, vel dictum magna rhoncus. Nam viverra sapien ac diam venenatis, non scelerisque nulla
+            tristique. Pellentesque commodo ullamcorper sapien, at posuere augue pretium in. Proin euismod, dolor
+            ac bibendum lobortis, sapien risus mollis ante, ut pharetra lorem est quis magna.</p>
+
+        <h2>Meet the Team</h2>
+
+        <ul>
+            <li><strong>John Smith</strong> - CEO</li>
+            <li><strong>Jane Doe</strong> - CTO</li>
+            <li><strong>Bob Johnson</strong> - Lead Developer</li>
+        </ul>
+
+        <h3>Get in Touch</h3>
+
+        <p>Feel free to contact us with any questions or feedback:</p>
+
+        <form action="#" method="post">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="email">Email:</label>
+            <input type="text" id="email" name="email" required>
+
+            <label for="message">Message:</label>
+            <textarea id="message" name="message" rows="5" required></textarea>
+
+            <input type="submit" class="button" value="Send Message">
+        </form>
+    </div>
+</body>
+
+</html>
