@@ -40,15 +40,15 @@
             grid-gap: 20px;">
                 {% for song in songs %}
                 <div class="album-card">
-                    <a href="{{ song.trackLink }}">
+                    <a href="{{ song.trackLink }}" target="_blank">
                         <img src="{{ song.albumCoverURL }}" alt="{{ song.trackName }} album cover" class="album-image">
                     </a>
                 </div>
                 <div class="album-card-details">
-                    <a href="{{song.trackLink }}"">
+                    <a href="{{song.trackLink }}" target="_blank">
                         <h3>{{ song.trackName }}</h3>
                     </a>
-                    <a href=" {{ song.artistLink }}">
+                    <a href=" {{ song.artistLink }}" target="_blank">
                         <p>{{ song.artists }}</p>
                     </a>
                 </div>
