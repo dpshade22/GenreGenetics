@@ -164,12 +164,13 @@ class UserGenes:
                     "artists": [
                         {
                             "name": artist["name"],
-                            "spotify_url": artist["external_urls"]["spotify"],
+                            "spotifyURL": artist["external_urls"]["spotify"],
                             "artistID": artist["id"],
                         }
                         for artist in item["artists"]
                     ],
-                    "spotify_url": item["external_urls"]["spotify"],
+                    "albumCoverURL": item["track"]["album"]["images"][0]["url"],
+                    "spotifyURL": item["external_urls"]["spotify"],
                 }
                 for item in self.topTracks["items"]
             ]
@@ -182,12 +183,13 @@ class UserGenes:
                     "artistName": [
                         {
                             "name": artist["name"],
-                            "spotify_url": artist["external_urls"]["spotify"],
+                            "spotifyURL": artist["external_urls"]["spotify"],
                             "artistID": artist["id"],
                         }
                         for artist in item["track"]["artists"]
                     ],
-                    "spotify_url": item["track"]["external_urls"]["spotify"],
+                    "albumCoverURL": item["track"]["album"]["images"][0]["url"],
+                    "spotifyURL": item["track"]["external_urls"]["spotify"],
                 }
                 for item in self.recentTracks["items"]
             ]
@@ -204,21 +206,27 @@ class UserGenes:
 
     def getPrettyGenreDF(self, genre):
         tempDF = self.df[self.df["gene"] == genre]
-        tempDF = tempDF[["id", "trackName", "artistName", "spotify_url"]].copy()
+        tempDF = tempDF[["id", "trackName", "artistName", "spotifyURL", "albumCoverURL"]].copy()
 
         tempDF["artists"] = tempDF["artistName"].apply(
             lambda x: ", ".join([artist["name"] for artist in x])
         )
         tempDF["artistLink"] = tempDF["artistName"].apply(
-            lambda x: x[0]["spotify_url"] if x else None
+            lambda x: x[0]["spotifyURL"] if x else None
         )
-        tempDF["trackLink"] = tempDF["spotify_url"]
+        tempDF["trackLink"] = tempDF["spotifyURL"]
         tempDF["artistID"] = tempDF["artistName"].apply(
             lambda x: x[0]["artistID"] if x else None
         )
+        tempDF["albumCoverURL"] = tempDF["albumCoverURL"]
         self.readableGenes = tempDF
 
-        return tempDF[["trackName", "artists", "trackLink", "artistLink"]]
+        # add album cover URL to each song
+
+        return tempDF[["trackName", "artists", "trackLink", "artistLink", "albumCoverURL"]]
+    
+    
+
 
     def getRecentlyPlayed(self, limit=50):
         self.recentTracks = self.sp.current_user_recently_played(limit=limit)

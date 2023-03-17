@@ -29,34 +29,33 @@
     justify-content: space-evenly;
     align-items: flex-start;
     flex-wrap: wrap;
-    margin-bottom: 1.5rem;">
+    margin-bottom: 1.5rem;
+    height: 100vh;">
         <div style="width: 40vw;">
-            <h2>Songs and Artists</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Song</th>
-                        <th>Artist</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    {% for song in songs %}
-                    <tr class=" song-row">
-                        <td>
-                            <a href="{{ song.trackLink }}" target="_blank">{{ song.trackName }}</a>
-                        </td>
-
-                        <td>
-                            <a href="{{ song.artistLink }}" target="_blank">{{ song.artists }}</a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <h2 style="margin-bottom: 2rem;">Songs and Artists</h2>
+            <div style="display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-gap: 20px;">
+                {% for song in songs %}
+                <div class="album-card">
+                    <a href="{{ song.trackLink }}">
+                        <img src="{{ song.albumCoverURL }}" alt="{{ song.trackName }} album cover" class="album-image">
+                    </a>
+                </div>
+                <div class="album-card-details">
+                    <a href="{{song.trackLink }}"">
+                        <h3>{{ song.trackName }}</h3>
+                    </a>
+                    <a href=" {{ song.artistLink }}">
+                        <p>{{ song.artists }}</p>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
         </div>
-        <div class="sidebar-container">
+        <div class=" sidebar-container">
             <h2>New Recommendations</h2>
+            <p style="font-style: italic;">Recommendations made based on the songs on the left</p>
             <div class="recently-played-wrapper" id="recommendations-container">
                 <div class="recently-played-cards" id="recently-played-cards">
                     {% for recommendation in recommendations %}
@@ -76,6 +75,7 @@
             </div>
         </div>
     </div>
+
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>

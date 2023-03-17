@@ -54,9 +54,9 @@ def chart_data():
 @app.route("/songs/<genre>")
 def songs(genre):
     songs_df = user.getPrettyGenreDF(genre)
-    songs = songs_df[["trackName", "trackLink", "artists", "artistLink"]].to_dict(
-        "records"
-    )
+    songs = songs_df[["trackName", "trackLink", "artists", "artistLink", "albumCoverURL"]].to_dict("records")
+
+    print(songs)
     recommendations = user.getRecommendationsByGene(seed_genre=genre)
     print(recommendations[3])
     return render_template(

@@ -86,24 +86,56 @@ a:hover {
     color: #777;
 }
 
+/* Neomorphic Song Cards */
 .song-card {
     display: flex;
     align-items: center;
-    padding: 8px;
-    margin: 8px 0;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    height: 5rem;
-    /* Set the height of the card */
+    padding: 1rem;
+    margin: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s, box-shadow 0.3s;
+
+    height: 4rem;
+    /* Increase the height of the card */
 }
 
-.song-card-image {
-    flex-basis: 48px;
-    /* Decrease the width of the image */
-    flex-shrink: 0;
-    margin-right: 8px;
-    border-radius: 4px;
-    object-fit: cover;
+.album-card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.album-card img {
+    max-width: 100%;
+}
+
+.album-card-details p {
+    margin: 0;
+    color: #666;
+}
+
+.album-image {
+    width: 20rem;
+}
+
+.song-card-details {
+    text-align: center;
+}
+
+.song-card-details h3 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+
+.song-card:hover {
+    transform: translateY(5px);
+    /* Add a slight lift effect on hover */
+    background-color: rgba(0, 0, 0, 0.05);
+
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+    /* Increase the shadow size on hover */
 }
 
 .song-card-details {
@@ -115,19 +147,24 @@ a:hover {
 }
 
 .song-card-details h3 {
-    /* margin: 1rem; */
-    font-size: 14px;
-    /* Decrease the font size of the song name */
-    white-space: nowrap;
-    /* overflow: hidden; */
-    text-overflow: ellipsis;
+    margin: 0;
+    font-size: 1rem;
 }
 
 .song-card-details p {
     margin: 0;
-    font-size: 12px;
-    /* Decrease the font size of the artist and preference */
+    font-size: 1rem;
+    /* Increase the font size of the artist and preference */
 }
+
+.song-image {
+    width: 60px;
+    border-radius: 6%;
+}
+
+
+
+/* End of Neomorphic Song Cards */
 
 /* Style the scroll bar */
 
@@ -141,7 +178,9 @@ a:hover {
 .recently-played-wrapper {
     /* set the maximum width of the wrapper */
     max-width: 100%;
-    height: 30rem;
+    height: 40rem;
+    padding-right: 1rem;
+    padding-left: 1rem;
 
     /* enable horizontal scrolling for the wrapper */
     overflow-x: hidden;
@@ -171,32 +210,7 @@ a:hover {
     background-color: transparent;
 }
 
-.song-card {
-    display: flex;
-    /* Use a flexbox layout */
-    align-items: center;
-    /* Center the items vertically */
-    margin-bottom: 10px;
 
-}
-
-.song-card-image {
-    flex-shrink: 0;
-    /* Prevent the image from shrinking */
-    margin-right: 10px;
-    /* Add some spacing between the image and text */
-}
-
-.song-image {
-    width: 60px;
-    /* Adjust the width as needed */
-    height: 60px;
-    /* Adjust the height as needed */
-    border-radius: 10%;
-    /* Add rounding */
-    object-fit: cover;
-    /* Ensure the entire image is visible without stretching */
-}
 
 /* Define the fade-in class */
 

@@ -9,9 +9,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const counts = data.map(item => item.count);
     const maxCount = Math.max(...counts);
 
-    const gradient = chartElement.getContext('2d').createLinearGradient(0, 0, 1000, 0);
-    gradient.addColorStop(1, 'rgb(20, 70, 70)');
-    gradient.addColorStop(0, 'rgb(239, 221, 141)');
+    const gradient = chartElement.getContext('2d').createLinearGradient(0, 100, 1000, 0);
+    gradient.addColorStop(0, 'rgb(20, 70, 70)');
+    gradient.addColorStop(1, 'rgb(239, 221, 141)');
 
 
     const chart = new Chart(chartElement, {
