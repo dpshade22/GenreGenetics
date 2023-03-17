@@ -9,6 +9,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const counts = data.map(item => item.count);
     const maxCount = Math.max(...counts);
 
+    const gradient = chartElement.getContext('2d').createLinearGradient(0, 0, 1000, 0);
+    gradient.addColorStop(1, 'rgb(20, 70, 70)');
+    gradient.addColorStop(0, 'rgb(239, 221, 141)');
+
 
     const chart = new Chart(chartElement, {
         type: 'bar',
@@ -17,24 +21,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             datasets: [{
                 label: 'Genres',
                 data: counts,
-                backgroundColor: [
-                    'rgba(49, 85, 87, 0.8)',
-                    'rgba(96, 125, 128, 0.8)',
-                    'rgba(144, 165, 168, 0.8)',
-                    'rgba(192, 205, 208, 0.8)',
-                    'rgba(240, 245, 245, 0.8)',
-                    'rgba(248, 232, 198, 0.8)',
-                    'rgba(245, 193, 121, 0.8)'
-                ],
-                borderColor: [
-                    'rgba(49, 85, 87, 1)',
-                    'rgba(96, 125, 128, 1)',
-                    'rgba(144, 165, 168, 1)',
-                    'rgba(192, 205, 208, 1)',
-                    'rgba(240, 245, 245, 1)',
-                    'rgba(248, 232, 198, 1)',
-                    'rgba(245, 193, 121, 1)'
-                ],
+                backgroundColor: gradient,
+                borderColor: gradient,
                 borderWidth: 0.1
             }]
         },
@@ -57,4 +45,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             window.location.href = `/songs/${genre}`;
         }
     };
+
+    // Function to handle the intersection observer events
+    function handleIntersection(entries, observer) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                // Add the "show" class to the recommendations container when it is in view
+                $('#recommendations-container').addClass('show');
+                // Stop observing the element, since we only need to apply the effect once
+                observer.unobserve(entry.target);
+            }
+        });
+    }
+
+    // Create a new intersection observer
+    const observer = new IntersectionObserver(handleIntersection, { threshold: 0.2 });
+
+    // Observe the recommendations container element
+    observer.observe(document.querySelector('#recommendations-container'));
+
 });

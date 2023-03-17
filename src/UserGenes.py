@@ -196,9 +196,6 @@ class UserGenes:
             raise ValueError(
                 "At least one of 'topTracks' or 'recentTracks' must be True."
             )
-
-        print(self.df)
-
         # Drop duplicates based on track ID
         self.df.drop_duplicates(subset="id", inplace=True)
 

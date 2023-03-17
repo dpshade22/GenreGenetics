@@ -11,11 +11,10 @@
 
 <body>
     {% include 'navbar.html' %}
-
-    <div class="container">
+    <div>
         <h1>{{ genre }}</h1>
         {% if genre %}
-        <p><em>
+        <p style="text-align: center;"><em>
                 {% for letter in genre %}
                 {% if letter in acronym_explanations %}
                 {{ acronym_explanations[letter] }}
@@ -25,34 +24,41 @@
                 {% endfor %}
             </em></p>
         {% endif %}
+    </div>
+    <div style="display: flex;
+    justify-content: space-evenly;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;">
+        <div style="width: 40vw;">
+            <h2>Songs and Artists</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Song</th>
+                        <th>Artist</th>
+                    </tr>
+                </thead>
 
-        <h2>Songs and Artists</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Song</th>
-                    <th>Artist</th>
-                </tr>
-            </thead>
+                <tbody>
+                    {% for song in songs %}
+                    <tr class=" song-row">
+                        <td>
+                            <a href="{{ song.trackLink }}" target="_blank">{{ song.trackName }}</a>
+                        </td>
 
-            <tbody>
-                {% for song in songs %}
-                <tr class="song-row">
-                    <td>
-                        <a href="{{ song.trackLink }}" target="_blank">{{ song.trackName }}</a>
-                    </td>
-
-                    <td>
-                        <a href="{{ song.artistLink }}" target="_blank">{{ song.artists }}</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                        <td>
+                            <a href="{{ song.artistLink }}" target="_blank">{{ song.artists }}</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
         <div class="sidebar-container">
             <h2>New Recommendations</h2>
-            <div class="recently-played-wrapper">
-                <div class="recently-played-cards">
+            <div class="recently-played-wrapper" id="recommendations-container">
+                <div class="recently-played-cards" id="recently-played-cards">
                     {% for recommendation in recommendations %}
                     <a href="{{ recommendation['external_urls']['spotify'] }}" target="_blank" class="song-card">
                         <img src="{{ recommendation['album']['images'][0]['url'] }}"
@@ -72,6 +78,26 @@
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        const options = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.3
+        };
+
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.intersectionRatio < 0.3) return;
+                entry.target.classList.add('fade-in');
+            });
+        }, options);
+
+        const cards = document.querySelectorAll('.song-card');
+        cards.forEach(card => {
+            observer.observe(card);
+        });
+    </script>
+
 </body>
 
 </html>
