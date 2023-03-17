@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const data = chartData.data;
     const labels = data.map(item => item.genre);
     const counts = data.map(item => item.count);
+    const maxCount = Math.max(...counts);
+
 
     const chart = new Chart(chartElement, {
         type: 'bar',
@@ -33,13 +35,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                     'rgba(248, 232, 198, 1)',
                     'rgba(245, 193, 121, 1)'
                 ],
-                borderWidth: 1
+                borderWidth: 0.1
             }]
         },
         options: {
             scales: {
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    max: maxCount + 1
+
                 }
             }
         }

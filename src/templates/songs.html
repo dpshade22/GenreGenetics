@@ -1,4 +1,3 @@
-<!-- songs.html -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -26,6 +25,7 @@
                 {% endfor %}
             </em></p>
         {% endif %}
+
         <h2>Songs and Artists</h2>
         <table>
             <thead>
@@ -34,21 +34,43 @@
                     <th>Artist</th>
                 </tr>
             </thead>
+
             <tbody>
                 {% for song in songs %}
                 <tr class="song-row">
                     <td>
-                        <a href="{{ song.songLink }}" target="_blank">{{ song.name }}</a>
+                        <a href="{{ song.trackLink }}" target="_blank">{{ song.trackName }}</a>
                     </td>
+
                     <td>
-                        <a href="{{ song.artistLink}}" target="_blank">{{ song.artists }}</a>
+                        <a href="{{ song.artistLink }}" target="_blank">{{ song.artists }}</a>
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
-
         </table>
+        <div class="sidebar-container">
+            <h2>New Recommendations</h2>
+            <div class="recently-played-wrapper">
+                <div class="recently-played-cards">
+                    {% for recommendation in recommendations %}
+                    <a href="{{ recommendation['external_urls']['spotify'] }}" target="_blank" class="song-card">
+                        <img src="{{ recommendation['album']['images'][0]['url'] }}"
+                            alt="{{ recommendation['name'] }} image" class="song-image">
+
+                        <div class="song-card-details">
+                            <h3>{{ recommendation['name'] }}</h3>
+                            <p>{{ recommendation['artists'][0]['name'] }}</p>
+
+                        </div>
+                    </a>
+                    {% endfor %}
+
+                </div>
+            </div>
+        </div>
     </div>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </body>
 
