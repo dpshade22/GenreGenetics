@@ -1,9 +1,20 @@
 import os
 from flask import Flask, render_template, jsonify, redirect, send_from_directory
-from UserGenes import UserGenes
+from flask_caching import Cache
 import pandas as pd
 
+
+from UserGenes import UserGenes
+
 app = Flask(__name__)
+# Configuring Flask-Caching settings
+cache_config = {
+    "CACHE_TYPE": "simple",  # Flask-Caching type
+    "CACHE_DEFAULT_TIMEOUT": 360,  # Cache timeout in seconds (1 hour)
+}
+
+app.config.from_mapping(cache_config)
+cache = Cache(app)
 
 user = UserGenes()
 user.initTracksDF()
@@ -21,6 +32,7 @@ acronym_explanations = {
 
 
 @app.route("/")
+@cache.cached()
 def index():
     if not user.authManager.validate_token(user.authManager.get_cached_token()):
         auth_url = user.authManager.get_authorize_url()
@@ -39,12 +51,13 @@ def about():
 def favicon():
     return send_from_directory(
         os.path.join(app.root_path, "static"),
-        "favicon.ico",
+        "favicon.gif",
         mimetype="image/vnd.microsoft.icon",
     )
 
 
 @app.route("/chart_data")
+@cache.cached()
 def chart_data():
     data = user.getGeneData()
     options = {}
@@ -52,9 +65,12 @@ def chart_data():
 
 
 @app.route("/songs/<genre>")
+@cache.cached()
 def songs(genre):
     songs_df = user.getPrettyGenreDF(genre)
-    songs = songs_df[["trackName", "trackLink", "artists", "artistLink", "albumCoverURL"]].to_dict("records")
+    songs = songs_df[
+        ["trackName", "trackLink", "artists", "artistLink", "albumCoverURL"]
+    ].to_dict("records")
 
     print(songs)
     recommendations = user.getRecommendationsByGene(seed_genre=genre)

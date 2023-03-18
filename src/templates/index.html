@@ -18,6 +18,7 @@
     {% include 'navbar.html' %}
     <div class="chart-container">
         <div class="chart-wrapper">
+            <p>Click a bar to view more information about each gene</p>
             <canvas id="myChart"></canvas>
             <script src="{{ url_for('static', filename='main.js') }}"></script>
             <div class="category-explanations" style="margin-top: 2rem;">

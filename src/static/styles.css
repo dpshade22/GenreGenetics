@@ -2,7 +2,7 @@
 
 :root {
     --primary-color: rgba(19, 69, 69, 1);
-    --secondary-color: rgba(33, 126, 126, 1);
+    --secondary-color: #144646;
     --light-color: rgba(229, 229, 229, 1);
     --dark-color: rgba(51, 51, 51, 1);
     --font-family: 'Roboto', sans-serif;
@@ -39,8 +39,8 @@ a:hover {
     justify-content: space-evenly;
     align-items: flex-start;
     flex-wrap: wrap;
-    margin-bottom: 1.5rem;
-    margin-top: 4rem;
+    /* margin-bottom: 1.5rem; */
+    margin-top: 2rem;
 }
 
 .chart-wrapper {
@@ -52,9 +52,17 @@ a:hover {
     margin-bottom: 1.5rem;
 }
 
+.chart-wrapper p {
+    font-size: 1rem;
+    font-style: italic;
+    color: #333;
+    margin-bottom: 1rem;
+}
+
 .category-explanations {
     margin-top: 10px;
     /* Add some spacing between the category explanations and the recently played section */
+    line-height: 0.8rem;
 }
 
 
@@ -64,6 +72,7 @@ a:hover {
     min-width: 25rem;
     max-width: 50rem;
     margin-bottom: 1.5rem;
+
 }
 
 .recently-played {
@@ -131,9 +140,9 @@ a:hover {
 
 
 .song-card:hover {
-    transform: translateY(5px);
+    transform: translateY(-5px);
     /* Add a slight lift effect on hover */
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: rgba(0, 0, 0, 0.03);
 
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
     /* Increase the shadow size on hover */
@@ -177,24 +186,31 @@ a:hover {
 }
 
 .recently-played-wrapper {
-    /* set the maximum width of the wrapper */
     max-width: 100%;
-    height: 40rem;
-    padding-right: 1rem;
-    padding-left: 1rem;
-
-    /* enable horizontal scrolling for the wrapper */
+    height: 35rem;
+    padding: 1rem 1rem 1rem 1rem;
     overflow-x: hidden;
+    mask-image: linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) 7%, rgba(255, 255, 255, 0.9) 60%, rgba(255, 255, 255, 0.1) 80%, rgba(255, 255, 255, 0) 85%, rgba(255, 255, 255, 0));
+    mask-size: 100% 100%;
+    mask-repeat: no-repeat;
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE 10+ */
+    overflow: -moz-scrollbars-none;
+    /* Firefox */
 }
+
 
 .recently-played-cards {
     /* set the maximum width of the cards */
     max-width: 100%;
+    padding-bottom: 28rem;
 
 }
 
 .recently-played-wrapper::-webkit-scrollbar {
-    width: 8px;
+    width: 1px;
 }
 
 .recently-played-wrapper::-webkit-scrollbar-thumb {
@@ -262,7 +278,8 @@ h1 {
     text-align: center;
     background-color: var(--secondary-color);
     /* Add the same background color as the navbar */
-    padding: 4rem;
+    padding: 1rem;
+    padding-top: 2.15rem;
     padding-bottom: 0;
     /* Add some padding to make the text look better */
     color: white;
@@ -281,7 +298,8 @@ h3 {
 
 /* Text styles */
 
-p {
+p,
+em {
     margin-bottom: 1rem;
     line-height: 1.5;
 }
@@ -387,8 +405,8 @@ tr:hover {
     justify-content: left;
     align-items: center;
     background-color: var(--secondary-color);
-    padding: 1rem;
-    padding-top: 1.4rem;
+    padding: 0.75rem;
+    padding-top: 0.5rem;
     padding-left: 26rem;
 }
 

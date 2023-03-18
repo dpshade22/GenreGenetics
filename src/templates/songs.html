@@ -11,9 +11,13 @@
 
 <body>
     <div>
-        <h1 style="text-align: left;padding-left: 25rem;">Current Genre Gene: {{ genre }}</h1>
-        {% include 'navbar.html' %}
-
+        <h1 style="background-color: black;   transition: background-color 1s ease-in-out;">Current Genre Gene: {{
+            genre }}</h1>
+        <div class="navbar" style="background-color: black;">
+            <a href="{{ url_for('index') }}" class="navbar-item">Home</a>
+            <span class="navbar-spacer">&emsp;&emsp;|&emsp;&emsp; </span>
+            <a href="{{ url_for('about') }}" class="navbar-item">About</a>
+        </div>
     </div>
     <div style="display: flex;
     justify-content: space-evenly;
@@ -21,8 +25,8 @@
     flex-wrap: wrap;
     margin-bottom: 1.5rem;
     margin-top: 1.5rem;
-    height: 100vh;">
-        <div style="width: 40vw;">
+    height: 80vh;">
+        <div style="width: 40vw; padding-bottom: 2rem;">
             <h2 style="margin-bottom: 0.5rem; ">Songs and Artists</h2>
             {% if genre %}
             <p style="text-align: left; padding: 0.5rem;"><em>
