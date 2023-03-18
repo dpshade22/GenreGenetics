@@ -229,6 +229,20 @@ class UserGenes:
         ]
         return recentlyPlayedPretty
 
+    def getTopTracksForCard(self, limit=50):
+        self.topTracks = self.sp.current_user_top_tracks(limit=limit)
+        topTracksPretty = [
+            {
+                "name": item["name"],
+                "artist": item["artists"][0]["name"],
+                "url": item["external_urls"]["spotify"],
+                "gene": self._getGeneBySongID(item["id"]),
+                "image_url": item["album"]["images"][0]["url"],
+            }
+            for item in self.topTracks["items"]
+        ]
+        return topTracksPretty
+
     # Helper functions
     def _getGeneBySongID(self, song_id):
         audioFeatures = self.sp.audio_features([song_id])[0]

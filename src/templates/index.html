@@ -14,15 +14,19 @@
 </head>
 
 <body>
+    <div id="loading-screen">
+        <div class="spinner"></div>
+    </div>
     <h1>Your Spotify Genetics</h1>
     {% include 'navbar.html' %}
     <div class="chart-container">
         <div class="chart-wrapper">
-            <p>Click a bar to view more information about each gene</p>
-            <p> {{ gptSummary }} </p>
+            <p> {{ gptSummary, topTracks }} </p>
             <canvas id="myChart"></canvas>
 
             <div class="category-explanations" style="margin-top: 2rem;">
+                <p>Click a bar to view more information about each gene</p>
+
                 <h2>Category Explanations:</h2>
                 <ul>
                     <li><strong>Energy:</strong> High (H) / Low (L)</li>
@@ -31,13 +35,34 @@
                     <li><strong>Instrumentation:</strong> Electronic (E) / Acoustic (A)</li>
                 </ul>
             </div>
-            <script src="{{ url_for('static', filename='main.js') }}"></script>
         </div>
         <div class="sidebar-container">
-            <h2>Recently Played:</h2>
+            <form id="top-tracks-form" method="post" action="{{ url_for('select_top_tracks') }}">
+                <label class="radio"
+                    style="position: relative; display: inline-block; margin-right: 1.25rem; cursor: pointer; font-size: 1rem;">
+                    <input type="radio" name="top_tracks" value="True" {% if session["top_tracks"] %}checked{% endif %}
+                        style="position: absolute; opacity: 0; cursor: pointer;">
+                    <span style="position: relative; padding-left: 1.75rem; margin-right: 0;">View Top
+                        Tracks</span>
+                </label>
+                <label class="radio"
+                    style="position: relative; display: inline-block; cursor: pointer; font-size: 1rem;">
+                    <input type="radio" name="top_tracks" value="False" {% if not session["top_tracks"] %}checked{%
+                        endif %} style="position: absolute; opacity: 0; cursor: pointer;">
+                    <span style="position: relative; padding-left: 0.8rem;">View Recent Tracks</span>
+                </label>
+
+                <input type="hidden" name="current_top_tracks"
+                    value="{{ 'True' if session['top_tracks'] else 'False' }}">
+                <button type="submit"
+                    style="background-color: #144646; border: none; color: white; padding: 0.75rem 1.25rem; text-align: center; text-decoration: none; display: inline-block; font-size: 1rem; margin: 1rem; cursor: pointer; border-radius: 0.25rem;">Submit</button>
+            </form>
+
+
+            <h2>Top Songs:</h2>
             <div class="recently-played-wrapper fade-in">
                 <div class="recently-played-cards">
-                    {% for song in recentlyPlayedSongs %}
+                    {% for song in sidebarCards %}
                     <a href="{{ song.url }}" target="_blank" class="song-card fade-in">
                         <img src="{{ song.image_url }}" alt="{{ song.name }} image" class="song-image">
                         <div class="song-card-details">
@@ -53,6 +78,7 @@
 
         </div>
     </div>
+    <script src="{{ url_for('static', filename='main.js') }}" defer></script>
     <script type="text/javascript">
         window.addEventListener('scroll', function () {
             var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
@@ -72,7 +98,6 @@
             });
         });
     </script>
-
 </body>
 
 </html>
