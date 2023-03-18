@@ -14,9 +14,10 @@ class UserGenes:
             redirect_uri="http://localhost:8000/callback/",
         )
         self.sp = spotipy.Spotify(auth_manager=self.authManager)
-        self.topTracks = None
-        self.df = None
-        self.recentTracks = None
+        self.recentTracksDF = None
+        self.topTracksDF = None
+        self.topTrackIDs = []
+
         self.audioFeaturesDF = None
         self.readableGenes = None
 
@@ -26,22 +27,78 @@ class UserGenes:
 
     # Track information retrieval
     def initTracksDF(self):
-        self.getRecentlyPlayed()
-        self._createDataframe()
-        self.getAudioFeatures()
+        self.recentTracksDF = self.getRecentlyPlayed()
+        self.topTracksDF = self.getTopTracks()
 
-    def getTopTracks(self, limit=100):
-        self.topTracks = self.sp.current_user_top_tracks(limit=limit)
+        self.recentTracksDF = self.getAudioFeatures(self.recentTracksDF)
+        self.topTracksDF = self.getAudioFeatures(self.topTracksDF)
+
+    def getTopTracks(self, limit=50):
+        topTrackIDs = []
+        for item in self.sp.current_user_top_tracks(limit=limit)["items"]:
+            topTrackIDs.append(item["id"])
+
+        return self.createTrackInfoDataFrame(topTrackIDs)
 
     def getRecentlyPlayed(self, limit=50):
-        self.recentTracks = self.sp.current_user_recently_played(limit=limit)
+        recentTracks = self.sp.current_user_recently_played(limit=limit)
+        trackIds = [item["track"]["id"] for item in recentTracks["items"]]
+
+        return self.createTrackInfoDataFrame(trackIds)
+
+    def createTrackInfoDataFrame(self, trackIds):
+        trackInfo = self.sp.tracks(trackIds)["tracks"]
+        artistIds = list(
+            set([artist["id"] for track in trackInfo for artist in track["artists"]])
+        )
+
+        # Get the artist information using their IDs
+        artistInfo = self.sp.artists(artistIds)["artists"]
+        artistInfoDict = {
+            artist["id"]: {
+                "popularity": artist["popularity"],
+                "genres": artist["genres"],
+            }
+            for artist in artistInfo
+        }
+
+        data = []
+
+        for track in trackInfo:
+            artist_names = [artist["name"] for artist in track["artists"]]
+            artist_links = [
+                artist["external_urls"]["spotify"] for artist in track["artists"]
+            ]
+
+            trackData = {
+                "id": track["id"],
+                "trackName": track["name"],
+                "trackPopularity": f'{track["popularity"]} (0-100)',
+                "trackDurationMs": f'{track["duration_ms"]} ms',
+                "trackExplicit": track["explicit"],
+                "albumName": track["album"]["name"],
+                "albumType": track["album"]["album_type"],
+                "albumReleaseDate": track["album"]["release_date"],
+                "artistNames": artist_names,
+                "artistLinks": artist_links,
+                "artistID": track["artists"][0]["id"],
+                "artistGenres": artistInfoDict[track["artists"][0]["id"]]["genres"],
+                "artistPopularity": f'{artistInfoDict[track["artists"][0]["id"]]["popularity"]} (0-100)',
+                "spotifyURL": track["external_urls"]["spotify"],
+                "albumCoverURL": track["album"]["images"][0]["url"],
+            }
+            data.append(trackData)
+
+        df = pd.DataFrame(data)
+        return df
 
     # Audio features
-    def getAudioFeatures(self):
-        audioFeatures = self.sp.audio_features(self.df["id"])
+    def getAudioFeatures(self, df):
+        audioFeatures = self.sp.audio_features(df["id"])
         self.audioFeaturesDF = pd.DataFrame(audioFeatures)
-        self.df = pd.merge(self.df, self.audioFeaturesDF, on="id")
-        self._addGeneColumn()
+        df = pd.merge(df, self.audioFeaturesDF, on="id")
+        self._addGeneColumn(df)
+        return df
 
     # Gene calculation and analysis
     def _calculateGene(self, row):
@@ -100,18 +157,18 @@ class UserGenes:
     def getExamplesByGene(self, gene):
         return self.df[self.df["gene"] == gene]
 
-    def getGeneData(self):
+    def getGeneDataFromDF(self, df):
         data = []
-        for genre in self.df["gene"].unique():
+        for gene in df["gene"].unique():
             data.append(
                 {
-                    "genre": genre,
-                    "count": int(self.df[self.df["gene"] == genre]["gene"].count()),
+                    "genre": gene,
+                    "count": int(df[df["gene"] == gene]["gene"].count()),
                 }
             )
         return data
 
-    def getRecommendationsByGene(self, seed_genre=None, limit=20):
+    def getRecommendationsByGene(self, df, seed_genre=None, limit=20):
         """
         Get music recommendations based on the user's genes and other seed criteria.
         :param seed_genre: a gene to use as seed criteria
@@ -121,7 +178,7 @@ class UserGenes:
         if seed_genre is None:
             raise ValueError("A seed genre must be provided.")
 
-        self.getPrettyGenreDF(seed_genre)
+        self.readableGenes = df[df["gene"] == seed_genre]
 
         seed_artists = (
             self.readableGenes["artistID"]
@@ -155,80 +212,10 @@ class UserGenes:
 
         return recommendations["tracks"]
 
-    def _createDataframe(self):
-        if self.topTracks:
-            track_data = [
-                {
-                    "id": item["id"],
-                    "trackName": item["name"],
-                    "artists": [
-                        {
-                            "name": artist["name"],
-                            "spotifyURL": artist["external_urls"]["spotify"],
-                            "artistID": artist["id"],
-                        }
-                        for artist in item["artists"]
-                    ],
-                    "albumCoverURL": item["track"]["album"]["images"][0]["url"],
-                    "spotifyURL": item["external_urls"]["spotify"],
-                }
-                for item in self.topTracks["items"]
-            ]
-            self.df = pd.DataFrame(track_data)
-        elif self.recentTracks:
-            track_data = [
-                {
-                    "id": item["track"]["id"],
-                    "trackName": item["track"]["name"],
-                    "artistName": [
-                        {
-                            "name": artist["name"],
-                            "spotifyURL": artist["external_urls"]["spotify"],
-                            "artistID": artist["id"],
-                        }
-                        for artist in item["track"]["artists"]
-                    ],
-                    "albumCoverURL": item["track"]["album"]["images"][0]["url"],
-                    "spotifyURL": item["track"]["external_urls"]["spotify"],
-                }
-                for item in self.recentTracks["items"]
-            ]
-            self.df = pd.DataFrame(track_data)
-        else:
-            raise ValueError(
-                "At least one of 'topTracks' or 'recentTracks' must be True."
-            )
-        # Drop duplicates based on track ID
-        self.df.drop_duplicates(subset="id", inplace=True)
+    def _addGeneColumn(self, df):
+        df["gene"] = df.apply(self._calculateGene, axis=1)
 
-    def _addGeneColumn(self):
-        self.df["gene"] = self.df.apply(self._calculateGene, axis=1)
-
-    def getPrettyGenreDF(self, genre):
-        tempDF = self.df[self.df["gene"] == genre]
-        tempDF = tempDF[["id", "trackName", "artistName", "spotifyURL", "albumCoverURL"]].copy()
-
-        tempDF["artists"] = tempDF["artistName"].apply(
-            lambda x: ", ".join([artist["name"] for artist in x])
-        )
-        tempDF["artistLink"] = tempDF["artistName"].apply(
-            lambda x: x[0]["spotifyURL"] if x else None
-        )
-        tempDF["trackLink"] = tempDF["spotifyURL"]
-        tempDF["artistID"] = tempDF["artistName"].apply(
-            lambda x: x[0]["artistID"] if x else None
-        )
-        tempDF["albumCoverURL"] = tempDF["albumCoverURL"]
-        self.readableGenes = tempDF
-
-        # add album cover URL to each song
-
-        return tempDF[["trackName", "artists", "trackLink", "artistLink", "albumCoverURL"]]
-    
-    
-
-
-    def getRecentlyPlayed(self, limit=50):
+    def getRecentlyPlayedForCard(self, limit=50):
         self.recentTracks = self.sp.current_user_recently_played(limit=limit)
         recentlyPlayedPretty = [
             {

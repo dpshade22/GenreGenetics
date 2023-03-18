@@ -27,6 +27,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             }]
         },
         options: {
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
             scales: {
                 y: {
                     beginAtZero: true,

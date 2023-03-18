@@ -19,42 +19,35 @@
             <a href="{{ url_for('about') }}" class="navbar-item">About</a>
         </div>
     </div>
-    <div style="display: flex;
-    justify-content: space-evenly;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    margin-bottom: 1.5rem;
-    margin-top: 1.5rem;
-    height: 80vh;">
+    <div class="genre-container">
         <div style="width: 40vw; padding-bottom: 2rem;">
-            <h2 style="margin-bottom: 0.5rem; ">Songs and Artists</h2>
+            <h2 style="margin-bottom: 0.5rem; ">{{ genre }} Songs and Artists</h2>
             {% if genre %}
             <p style="text-align: left; padding: 0.5rem;"><em>
-                    {% for letter in genre %}
+                    <!-- {% for letter in genre %}
                     {% if letter in acronym_explanations %}
                     {{ acronym_explanations[letter] }}
                     {% if not loop.last %},
                     {% endif %}
                     {% endif %}
-                    {% endfor %}
+                    {% endfor %} -->
+                    {{ gptSummary }}
                 </em></p>
             {% endif %}
-            <div style="display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            grid-gap: 20px;">
+            <div class="grid-container">
                 {% for song in songs %}
                 <div class="album-card">
-                    <a href="{{ song.trackLink }}" target="_blank">
+                    <a href="{{ song.spotifyURL }}" target="_blank">
                         <img src="{{ song.albumCoverURL }}" alt="{{ song.trackName }} album cover" class="album-image">
                     </a>
-                </div>
-                <div class="album-card-details">
-                    <a href="{{song.trackLink }}" target="_blank">
-                        <h3>{{ song.trackName }}</h3>
-                    </a>
-                    <a href=" {{ song.artistLink }}" target="_blank">
-                        <p>{{ song.artists }}</p>
-                    </a>
+                    <div class="album-card-details">
+                        <a href="{{song.spotifyURL }}" target="_blank">
+                            <h3>{{ song.trackName }}</h3>
+                        </a>
+                        <a href=" {{ song.artistLinks[0] }}" target="_blank">
+                            <p>{{ song.artistNames[0] }}</p>
+                        </a>
+                    </div>
                 </div>
                 {% endfor %}
             </div>
