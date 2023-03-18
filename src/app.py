@@ -100,13 +100,10 @@ def get_top_tracks_status():
     return session.get("top_tracks", False)
 
 
-# Your app routes and the rest of the code
-
-
 @app.route("/", methods=["GET", "POST"])
-# @cache.cached(86400)
+# @cache.cached(timeout=60, make_cache_key=lambda: f"index_{session['top_tracks']}")
 def index():
-    session["top_tracks"] = True
+    session["top_tracks"] = False
     top_tracks = get_top_tracks_status()
     selectedDF = get_selected_dataframe(user, top_tracks)
 
@@ -136,7 +133,6 @@ def index():
     # )
     # topTracksSummaryText = topTracksSummaryResp["choices"][0]["message"]["content"]
     topTracksSummaryText = "Test"
-    print(top_tracks)
 
     if not user.authManager.validate_token(user.authManager.get_cached_token()):
         auth_url = user.authManager.get_authorize_url()

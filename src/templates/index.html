@@ -21,43 +21,42 @@
     {% include 'navbar.html' %}
     <div class="chart-container">
         <div class="chart-wrapper">
-            <p> {{ gptSummary, topTracks }} </p>
+            <!-- <p>{{ gptSummary }}</p> -->
             <canvas id="myChart"></canvas>
 
-            <div class="category-explanations" style="margin-top: 2rem;">
-                <p>Click a bar to view more information about each gene</p>
+            <div class="bottom-chart">
+                <div class="category-explanations" style="margin-top: 2rem;">
+                    <p>Click a bar to view more information about each gene</p>
 
-                <h2>Category Explanations:</h2>
-                <ul>
-                    <li><strong>Energy:</strong> High (H) / Low (L)</li>
-                    <li><strong>Mood:</strong> Positive (P) / Negative (N)</li>
-                    <li><strong>Tempo:</strong> Fast (F) / Slow (S)</li>
-                    <li><strong>Instrumentation:</strong> Electronic (E) / Acoustic (A)</li>
-                </ul>
+                    <h2>Category Explanations:</h2>
+                    <ul>
+                        <li><strong>Energy:</strong> High (H) / Low (L)</li>
+                        <li><strong>Mood:</strong> Positive (P) / Negative (N)</li>
+                        <li><strong>Tempo:</strong> Fast (F) / Slow (S)</li>
+                        <li><strong>Instrumentation:</strong> Electronic (E) / Acoustic (A)</li>
+                    </ul>
+                </div>
+                <form id="chart-form">
+                    <div class="radio-group">
+                        <label class="radio">
+                            <input id="top-tracks-form-true" type="radio" name="top_tracks" value="True" {% if
+                                session["top_tracks"] %}checked{% endif %}>
+                            <span>View Top Tracks</span>
+                        </label>
+                        <label class="radio">
+                            <input id="top-tracks-form-false" type="radio" name="top_tracks" value="False" {% if not
+                                session["top_tracks"] %}checked{% endif %}>
+                            <span>View Recent Tracks</span>
+                        </label>
+                    </div>
+                    <button type="submit" class="custom-submit">Submit</button>
+                </form>
             </div>
         </div>
         <div class="sidebar-container">
-            <form id="top-tracks-form" method="post" action="{{ url_for('select_top_tracks') }}">
-                <label class="radio"
-                    style="position: relative; display: inline-block; margin-right: 1.25rem; cursor: pointer; font-size: 1rem;">
-                    <input type="radio" name="top_tracks" value="True" {% if session["top_tracks"] %}checked{% endif %}
-                        style="position: absolute; opacity: 0; cursor: pointer;">
-                    <span style="position: relative; padding-left: 1.75rem; margin-right: 0;">View Top
-                        Tracks</span>
-                </label>
-                <label class="radio"
-                    style="position: relative; display: inline-block; cursor: pointer; font-size: 1rem;">
-                    <input type="radio" name="top_tracks" value="False" {% if not session["top_tracks"] %}checked{%
-                        endif %} style="position: absolute; opacity: 0; cursor: pointer;">
-                    <span style="position: relative; padding-left: 0.8rem;">View Recent Tracks</span>
-                </label>
+            <div class="category-explanations" style="margin-top: 2rem;">
 
-                <input type="hidden" name="current_top_tracks"
-                    value="{{ 'True' if session['top_tracks'] else 'False' }}">
-                <button type="submit"
-                    style="background-color: #144646; border: none; color: white; padding: 0.75rem 1.25rem; text-align: center; text-decoration: none; display: inline-block; font-size: 1rem; margin: 1rem; cursor: pointer; border-radius: 0.25rem;">Submit</button>
-            </form>
-
+            </div>
 
             <h2>Top Songs:</h2>
             <div class="recently-played-wrapper fade-in">
@@ -72,12 +71,11 @@
                         </div>
                     </a>
                     {% endfor %}
-
                 </div>
             </div>
-
         </div>
     </div>
+
     <script src="{{ url_for('static', filename='main.js') }}" defer></script>
     <script type="text/javascript">
         window.addEventListener('scroll', function () {

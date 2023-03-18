@@ -59,6 +59,12 @@ a:hover {
     margin-bottom: 1rem;
 }
 
+.bottom-chart {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
 .category-explanations {
     margin-top: 10px;
     /* Add some spacing between the category explanations and the recently played section */
@@ -115,7 +121,6 @@ a:hover {
 }
 
 /* Loading  */
-/* Add these rules to your styles.css file */
 #loading-screen {
     position: fixed;
     top: 0;
@@ -148,72 +153,101 @@ a:hover {
     }
 }
 
-/* Custom radio buttons */
-.custom-radio {
+/* Apply styles to input */
+/* Hide the input */
+#chart-form {
+    color: white;
+    color: white;
+    float: right;
+    padding-top: 4rem;
+}
+
+#chart-form input {
+    position: absolute;
+    left: -9999px;
+}
+
+/* Style the label */
+#chart-form label {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    font-weight: 200;
     position: relative;
-    display: inline-block;
-    margin-right: 1.25rem;
-    width: 1rem;
-    height: 1rem;
+    overflow: hidden;
+    margin-bottom: 0.375em;
+    color: var(--primary-color);
 }
 
-.custom-radio input[type="radio"] {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
+/* Style the label text */
+#chart-form span {
+    display: flex;
+    align-items: center;
+    padding: 0.375em 0.75em 0.375em 0.375em;
+    border-radius: 99em;
+    transition: 0.25s ease;
 }
 
-.custom-radio span {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 1rem;
-    width: 1rem;
-    border: 1px solid #aaa;
+/* Style the radio button */
+#chart-form span::before {
+    display: flex;
+    flex-shrink: 0;
+    content: "";
+    background-color: #fff;
+    width: 1.5em;
+    height: 1.5em;
     border-radius: 50%;
+    margin-right: 0.375em;
+    transition: 0.25s ease;
+    box-shadow: inset 0 0 0 0.125em var(--primary-color);
 }
 
-.custom-radio input[type="radio"]:checked~span {
-    border-color: #2196F3;
-    background-color: #2196F3;
+/* Style the checked radio button */
+#chart-form input:checked+span::before {
+    background-color: var(--secondary-color);
 }
 
-/* Additional styles for the labels */
-.custom-radio label {
-    font-size: 1rem;
-    cursor: pointer;
-    padding-left: 1.75rem;
-}
-
-.custom-radio label:first-child {
-    padding-right: 1.25rem;
+/* Style the checked radio button label */
+#chart-form input:checked+span {
+    background-color: mix(var(--accent-color), var(--primary-color), 84%);
 }
 
 
 /* Custom submit button */
 .custom-submit {
-    background-color: #4CAF50;
+    background-color: var(--primary-color);
     border: none;
     color: white;
-    padding: 12px 20px;
+    padding: 0.75em 1.5em;
     text-align: center;
     text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
     cursor: pointer;
-    border-radius: 4px;
+    border-radius: 99em;
+    transition: 0.25s ease;
+    height: 3rem;
+    min-width: 4rem;
+    max-width: 8rem;
 }
 
 .custom-submit:hover {
-    background-color: #3e8e41;
+    opacity: 0.8;
 }
 
 .custom-submit:active {
-    background-color: #3e8e41;
-    box-shadow: 0 5px #666;
-    transform: translateY(4px);
+    background-color: mix(var(--primary-color), var(--accent-color), 74%);
+    box-shadow: 0 0.125em 0.125em rgba(0, 0, 0, 0.2);
+    transform: translateY(0.25em);
 }
+
+.custom-submit:focus {
+    outline: none;
+    box-shadow: 0 0 0 0.125em var(--accent-color);
+}
+
 
 
 /* Neomorphic Song Cards */

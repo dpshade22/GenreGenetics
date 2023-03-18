@@ -2,14 +2,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     let chart;
 
     function showLoadingScreen() {
-        document.getElementById("loading-screen").style.display = "flex";
+        const loadingScreen = document.getElementById("loading-screen");
+        loadingScreen.style.display = "flex";
+        loadingScreen.style.opacity = "1";
     }
 
     function hideLoadingScreen() {
-        document.getElementById("loading-screen").style.display = "none";
+        const loadingScreen = document.getElementById("loading-screen");
+        loadingScreen.style.opacity = "0";
+        setTimeout(() => {
+            loadingScreen.style.display = "none";
+        }, 1000); // Hide the loading screen after 500ms to allow for fade out animation
     }
 
-    async function fetchDataAndRenderChart() {
+
+    async function renderChart() {
         if (chart) {
             chart.destroy(); // Destroy the previous chart instance if it exists
         }
@@ -18,6 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         chartElement.width = 2000;
         chartElement.height = 1200;
         const topTracks = document.querySelector('input[name="top_tracks"]:checked').value;
+        console.log(`/chart_data?top_tracks=${topTracks}`)
         const response = await fetch(`/chart_data?top_tracks=${topTracks}`);
         const chartData = await response.json();
         const data = chartData.data;
@@ -112,37 +120,32 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             sidebarCardContainer.appendChild(songCard);
         }
+        hideLoadingScreen();
+    }
+
+    async function updateChartAndSidebar() {
+        showLoadingScreen();
+
+        try {
+            await Promise.all([renderChart(), updateSidebarCards()]);
+        } catch (error) {
+            console.error(error);
+            // Handle error as needed
+        } finally {
+            hideLoadingScreen();
+        }
     }
 
 
+    // Call the function initially to render the chart and update the sidebar cards
+    await updateChartAndSidebar();
 
+    // Set up event listeners for the form
+    const form = document.getElementById('chart-form');
 
-    // Call the function initially to render the chart
-    fetchDataAndRenderChart();
-    updateSidebarCards(); // Call the function to update the sidebar cards
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
 
-    hideLoadingScreen();
-
-    // Add the submit event listener to the form
-    document.getElementById("top-tracks-form").addEventListener("submit", async function (event) {
-        event.preventDefault(); // prevent the default form submission behavior
-
-
-        // Collect the form data
-        const formData = new FormData(event.target);
-
-        // Post the form data
-        const response = await fetch(event.target.action, {
-            method: 'POST',
-            body: formData
-        });
-
-        // Check if the response is ok, and re-execute the chart rendering function
-        if (response.ok) {
-            showLoadingScreen(); // Show the loading screen
-            fetchDataAndRenderChart(); // Call the function to render the chart
-            await updateSidebarCards(); // Call the function to update the sidebar cards'
-            hideLoadingScreen(); // Hide the loading screen
-        }
+        await updateChartAndSidebar();
     });
 });
