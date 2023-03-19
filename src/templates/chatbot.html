@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Custom Chatbot</title>
+    <style>
+        body {
+            background-color: #f9f9f9;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            color: #333;
+            margin: 0 0 20px;
+            text-align: center;
+        }
+
+        #chatbot-input {
+            border: none;
+            border-bottom: 2px solid #666;
+            font-size: 16px;
+            margin-right: 10px;
+            padding: 10px;
+            width: 80%;
+        }
+
+        #chatbot-send {
+            background-color: #4CAF50;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 10px;
+            width: 20%;
+        }
+
+        #chatbot-send:hover {
+            background-color: #3e8e41;
+        }
+
+        #chatbot-messages {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            height: 400px;
+            margin-top: 20px;
+            overflow-y: scroll;
+            padding: 10px;
+            width: 100%;
+        }
+
+        .system {
+            color: #777;
+            font-style: italic;
+        }
+
+        .user {
+            color: #333;
+            text-align: right;
+        }
+
+        .user input[type=text] {
+            border: none;
+            border-bottom: 2px solid #666;
+            font-size: 16px;
+            margin-right: 10px;
+            padding: 10px;
+            width: 80%;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Custom Chatbot</h1>
+    <div class="navbar" style="background-color: black;">
+        <a href="{{ url_for('index') }}" class="navbar-item">Home</a>
+        <span class="navbar-spacer">&emsp;&emsp;|&emsp;&emsp; </span>
+        <a href="{{ url_for('about') }}" class="navbar-item">About</a>
+    </div>
+    <div>
+        <input type="text" id="chatbot-input" placeholder="Type your message here...">
+        <button id="chatbot-send">Send</button>
+    </div>
+    <div id="chatbot-messages"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@openai/chat-dynamic@latest"></script>
+    <script>
+        const chat = new dynamicChat(
+            "{{ OPENAI_API_KEY }}}",
+            "gpt-3.5-turbo"
+        );
+
+        const messagesDiv = document.getElementById("chatbot-messages");
+        const input = document.getElementById("chatbot-input");
+
+        const sendMessage = async () => {
+            const message = input.value;
+            input.value = "";
+
+            const response = await chat.sendMessage(message);
+
+            const messageDiv = document.createElement("div");
+            messageDiv.classList.add(response.role);
+            messageDiv.innerText = response.text;
+
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        };
+
+        document.getElementById("chatbot-send").addEventListener("click", sendMessage);
+        input.addEventListener("keydown", (event) => {
+            if (event.keyCode === 13) {
+                event.preventDefault();
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+
+</html>

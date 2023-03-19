@@ -156,6 +156,7 @@ a:hover {
 /* Apply styles to input */
 /* Hide the input */
 #chart-form {
+    position: relative;
     color: white;
     color: white;
     float: right;
@@ -213,12 +214,20 @@ a:hover {
 }
 
 
+.radio-group {
+    display: flex;
+    flex-direction: column;
+}
+
 /* Custom submit button */
 .custom-submit {
+    position: absolute;
+    left: -4rem;
+    top: 5.5rem;
     background-color: var(--primary-color);
     border: none;
     color: white;
-    padding: 0.75em 1.5em;
+    padding: 1rem 1rem;
     text-align: center;
     text-decoration: none;
     display: inline-flex;
@@ -228,9 +237,11 @@ a:hover {
     cursor: pointer;
     border-radius: 99em;
     transition: 0.25s ease;
-    height: 3rem;
-    min-width: 4rem;
-    max-width: 8rem;
+    height: 1.8rem;
+    min-width: 3rem;
+    max-width: 5rem;
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
 }
 
 .custom-submit:hover {
@@ -277,7 +288,7 @@ a:hover {
 }
 
 .album-card-details h3 {
-    white-space: nowrap;
+    white-space: wrap;
     text-overflow: ellipsis;
     overflow: hidden;
     --min-font-size: 16px;

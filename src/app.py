@@ -44,16 +44,30 @@ def get_acronym_explanations():
 
 
 def get_selected_dataframe(user, top_tracks):
-    return user.topTracksDF if top_tracks else user.recentTracksDF
+    df = user.topTracksDF if top_tracks else user.recentTracksDF
+    subset = ["trackName", "artistNames"]
+
+    # Convert lists in the "artistNames" column to tuples or strings
+    df["artistNames"] = df["artistNames"].apply(tuple)
+
+    df = df.drop_duplicates(subset=subset)
+    return df
 
 
-def get_prompt_for_gpt_music_summary(top_tracks):
+def get_prompt_for_gpt_music_summary(top_tracks, genre=""):
     top_or_recent = "top" if top_tracks else "recent"
     return f"""
-    Given my {top_or_recent} tracks, artist names, album names, track duration 
-    preferences, explicit music preferences, singles or albums preferences, 
-    new or old music preferences, and genre distribution, provide a comprehensive 
-    summary of my music taste and listening habits.
+    Your task is to create a personalized 4 sentence summary of your listener's 
+    music taste that truly resonates with them. Use your analysis of 
+    a specific number of songs to draw conclusions about their personality 
+    traits, values, and even lifestyle. Make sure to use language that is 
+    both clear and engaging, avoiding any technical jargon that could cause 
+    confusion. To create a summary that truly connects with your listener, address 
+    them directly and showcase examples of artists and songs that support your conclusions. 
+    It's important to consider factors such as the popularity of the songs and artists to determine 
+    if your listener is a mainstream or niche listener. By doing so, you'll be able to tailor your 
+    summary to their unique tastes, making it a personalized experience that they won't forget! So, 
+    let's get started and make your listener feel truly understood through the power of music.
     """
 
 
@@ -101,7 +115,7 @@ def get_top_tracks_status():
 
 
 @app.route("/", methods=["GET", "POST"])
-# @cache.cached(timeout=60, make_cache_key=lambda: f"index_{session['top_tracks']}")
+@cache.cached(timeout=3600)  # Cache for 1 hour
 def index():
     session["top_tracks"] = False
     top_tracks = get_top_tracks_status()
@@ -127,7 +141,7 @@ def index():
     #         },
     #         {
     #             "role": "user",
-    #             "content": gptSummaryJSON,
+    #             "content": f"Here is a list of my {'top listened to tracks' if top_tracks else 'recently listened to tracks'}{gptSummaryJSON}",
     #         },
     #     ],
     # )
@@ -155,6 +169,13 @@ def index():
 @app.route("/about")
 def about():
     return render_template("about.html", title="About Genre Genetics")
+
+
+@app.route("/chatbot")
+def chatbot():
+    return render_template(
+        "chatbot.html", OPENAI_API_KEY=os.environ.get("OPENAI_API_KEY")
+    )
 
 
 @app.route("/favicon.ico")
@@ -195,18 +216,37 @@ def select_top_tracks():
 @app.route("/songs/<genre>")
 @cache.cached()
 def songs(genre):
+    top_tracks = get_top_tracks_status()
+    print(f"top_tracks: {top_tracks}")
     selectedDF = get_selected_dataframe(user, get_top_tracks_status())
     acronymExplanations = get_acronym_explanations()
-    songs_df = selectedDF[selectedDF["gene"] == genre]
+    selectedDF = selectedDF[selectedDF["gene"] == genre]
 
-    songs = songs_df[
+    songs = selectedDF[
         ["trackName", "spotifyURL", "artistNames", "artistLinks", "albumCoverURL"]
     ].to_dict("records")
 
     recommendations = user.getRecommendationsByGene(selectedDF, seed_genre=genre)
-    genreAcronyms = [
-        acronymExplanations[letter] for letter in genre if letter in acronymExplanations
-    ]
+    promptForGPTMusicSummary = get_prompt_for_gpt_music_summary(
+        top_tracks=top_tracks, genre=genre
+    )
+    gptSummaryDF = get_gpt_summary_dataframe(selectedDF)
+    gptSummaryJSON = gptSummaryDF.to_json(orient="records")
+    print(gptSummaryJSON)
+    topTracksSummaryResp = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {
+                "role": "system",
+                "content": promptForGPTMusicSummary,
+            },
+            {
+                "role": "user",
+                "content": gptSummaryJSON,
+            },
+        ],
+    )
+    topTracksSummaryText = topTracksSummaryResp["choices"][0]["message"]["content"]
 
     return render_template(
         "songs.html",
@@ -214,7 +254,7 @@ def songs(genre):
         songs=songs,
         acronym_explanations=acronymExplanations,
         recommendations=recommendations,
-        # gptSummary=text,
+        musicTasteSummary=topTracksSummaryText,
     )
 
 

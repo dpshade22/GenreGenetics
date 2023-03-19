@@ -180,6 +180,9 @@ class UserGenes:
 
         self.readableGenes = df[df["gene"] == seed_genre]
 
+        if self.readableGenes.empty:
+            return []
+
         seed_artists = (
             self.readableGenes["artistID"]
             .sample(n=min(2, len(self.readableGenes)))
@@ -205,11 +208,9 @@ class UserGenes:
 
         recommendations = self.sp.recommendations(
             seed_artists=seed_artists,
-            # seed_genre=seed_genre,
             seed_tracks=seed_tracks,
             limit=limit,
         )
-
         return recommendations["tracks"]
 
     def _addGeneColumn(self, df):
@@ -217,6 +218,14 @@ class UserGenes:
 
     def getRecentlyPlayedForCard(self, limit=50):
         self.recentTracks = self.sp.current_user_recently_played(limit=limit)
+
+        def not_seen_and_add(seen, track, artist):
+            if (track, artist) not in seen:
+                seen.add((track, artist))
+                return True
+            return False
+
+        seen = set()
         recentlyPlayedPretty = [
             {
                 "name": item["track"]["name"],
@@ -226,6 +235,9 @@ class UserGenes:
                 "image_url": item["track"]["album"]["images"][0]["url"],
             }
             for item in self.recentTracks["items"]
+            if not_seen_and_add(
+                seen, item["track"]["name"], item["track"]["artists"][0]["name"]
+            )
         ]
         return recentlyPlayedPretty
 

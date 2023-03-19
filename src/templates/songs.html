@@ -22,17 +22,8 @@
     <div class="genre-container">
         <div style="width: 40vw; padding-bottom: 2rem;">
             <h2 style="margin-bottom: 0.5rem; ">{{ genre }} Songs and Artists</h2>
-            {% if genre %}
-            <p style="text-align: left; padding: 0.5rem;"><em>
-                    <!-- {% for letter in genre %}
-                    {% if letter in acronym_explanations %}
-                    {{ acronym_explanations[letter] }}
-                    {% if not loop.last %},
-                    {% endif %}
-                    {% endif %}
-                    {% endfor %} -->
-                    {{ gptSummary }}
-                </em></p>
+            {% if musicTasteSummary %}
+            <p style="text-align: left; padding: 0.5rem;"><em>{{ musicTasteSummary }}</em></p>
             {% endif %}
             <div class="grid-container">
                 {% for song in songs %}
