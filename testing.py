@@ -3,29 +3,73 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
+import openai
+import os
+from dotenv import load_dotenv
+import pandas as pd
+from src.UserGenes import UserGenes
+
+load_dotenv()
 
 openai.api_key = os.environ.get("OPENAI_API_KEY")
-msg = "Summarize my music taste"
-summ = '[{"trackName":"Fruit&Sun","trackPopularity":"51 (0-100)","trackDurationMs":"177857 ms","trackExplicit":false,"albumName":"The Color of Nothing","albumType":"album","albumReleaseDate":"2020-10-16","artistNames":["ford."],"artistLinks":["https:\/\/open.spotify.com\/artist\/7ItbAZITSFxSy5LJChXe18"],"artistGenres":["new french touch","vapor soul","vapor twitch"],"artistPopularity":"56 (0-100)","type":"audio_features","track_href":"https:\/\/api.spotify.com\/v1\/tracks\/69cmKJCT4thXR1qT1g34w7","duration_ms":177857,"time_signature":4,"gene":"HNFA"},{"trackName":"belong","trackPopularity":"50 (0-100)","trackDurationMs":"173493 ms","trackExplicit":false,"albumName":"komorebi","albumType":"album","albumReleaseDate":"2019-09-20","artistNames":["slenderbodies"],"artistLinks":["https:\/\/open.spotify.com\/artist\/3S4d3YRNGg2OhnNm3QvfhA"],"artistGenres":["indie poptimism","indie soul","vapor soul"],"artistPopularity":"54 (0-100)","type":"audio_features","track_href":"https:\/\/api.spotify.com\/v1\/tracks\/33n1o7mzohXiCzS6Rr5q2E","duration_ms":173493,"time_signature":4,"gene":"HNFA"}]'
+
+
+def parse_spotify_data(df):
+    url_cols = [
+        "spotifyURL",
+        "artistLinks",
+        "artistGenres",
+        "artistID",
+        "analysis_url",
+        "track_href",
+        "uri",
+        "albumCoverURL",
+        "id",
+    ]
+    non_url_cols = [col for col in df.columns if col not in url_cols]
+    return df[non_url_cols].to_dict(orient="records")
+
+
+def get_top_tracks():
+    userGenes = UserGenes()
+    userGenes.authenticate()
+    userGenes.initTracksDF()
+    top_tracks = userGenes.topTracksDF.head(10)
+    return parse_spotify_data(top_tracks)
+
+
 messages = [
     {
         "role": "system",
         "content": f"You are a personalized music taste assistant. Try to use as much information from the following in order to answer their questions.",
     },
-    {"role": "user", "content": "This is a sample of my music taste: {summ}"},
+    {
+        "role": "user",
+        "content": f"Here are my top tracks: {get_top_tracks()}",
+    },
     {
         "role": "assistant",
-        "content": "Thank you for sending me a sample of the type of music you enjoy listening to. Ask me follow up questions and I will use your samples as a guide to answer them.",
+        "content": "Thanks for sharing your top tracks information! What questions do you have about your music?",
     },
 ]
 
 while True:
     msg = input("Enter your message: ")
     messages.append({"role": "user", "content": f"{msg}"})
-    resp = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=messages,
-    )
-    text = resp["choices"][0]["message"]["content"]
-    messages.append({"role": "assistant", "content": f"{text}"})
+    if "top tracks" in msg.lower():
+        num_tracks = int(msg.split()[-1])
+        top_tracks = get_top_tracks(num_tracks)
+        messages.append(
+            {
+                "role": "assistant",
+                "content": f"Here are your top {num_tracks} tracks: {top_tracks}",
+            }
+        )
+    else:
+        resp = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=messages,
+        )
+        text = resp["choices"][0]["message"]["content"]
+        messages.append({"role": "assistant", "content": f"{text}"})
     print(text)
