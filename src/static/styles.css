@@ -276,18 +276,27 @@ a:hover {
     /* Increase the height of the card */
 }
 
-/* .song-card:hover .in-library-indicator {
-    background-color: rgba(0, 255, 0, 0.1); */
-/* Soft green with 10% opacity */
-/* } */
-
-/* .song-card:hover .not-in-library-indicator { */
-/* background-color: rgba(255, 0, 0, 0.1);
-    /* Soft red with 10% opacity */
-/* }  */
-
 .library-indicator {
     position: relative;
+}
+
+.library-indicator::before {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-left: 0.5rem;
+    /* background-color: #333; */
+    color: var(--dark-color);
+    border-radius: 5px;
+    font-size: 14px;
+    opacity: 0.5;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.library-indicator:hover::before {
+    opacity: 1;
 }
 
 .album-card {

@@ -51,7 +51,7 @@ class UserGenes:
 
         return self.createTrackInfoDataFrame(trackIds)
 
-    def createTrackInfoDataFrame(self, trackIds):
+    def createTrackInfoDataFrame(self, trackIds) -> pd.DataFrame:
         trackInfo = self.sp.tracks(trackIds)["tracks"]
         artistIds = list(
             set([artist["id"] for track in trackInfo for artist in track["artists"]])
@@ -220,16 +220,25 @@ class UserGenes:
             seed_tracks=seed_tracks,
             limit=limit,
         )
-        return recommendations["tracks"]
+
+        recommendationsDF = self.createTrackInfoDataFrame(
+            list(pd.DataFrame(recommendations["tracks"])["id"])
+        )
+        recommendationsDF["inLibrary"] = self.isInLibrary(recommendationsDF["id"])
+
+        return recommendationsDF
 
     def _addGeneColumn(self, df):
         df["gene"] = df.apply(self._calculateGene, axis=1)
 
     def getRecentlyPlayedForCard(self, limit=50):
-        recentTracks = self.recentTracksDF[
-            ["trackName", "artistNames", "albumCoverURL", "spotifyURL", "inLibrary"]
-        ]
-        recentTracks.drop_duplicates(subset=("trackName", "artistNames"), inplace=True)
+        recentTracks = (
+            self.recentTracksDF[
+                ["trackName", "artistNames", "albumCoverURL", "spotifyURL", "inLibrary"]
+            ]
+            .drop_duplicates(subset=("trackName", "artistNames"))
+            .copy()
+        )
         recentTracksList = recentTracks.to_dict("records")
 
         return [

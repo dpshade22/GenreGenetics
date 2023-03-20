@@ -48,18 +48,20 @@
             <p style="font-style: italic;">Recommendations made based on the songs on the left</p>
             <div class="recently-played-wrapper" id="recommendations-container">
                 <div class="recently-played-cards" id="recently-played-cards">
-                    {% for recommendation in recommendations %}
-                    <a href="{{ recommendation['external_urls']['spotify'] }}" target="_blank" class="song-card">
-                        <img src="{{ recommendation['album']['images'][0]['url'] }}"
-                            alt="{{ recommendation['name'] }} image" class="song-image">
-
+                    {% for index, row in recommendations.iterrows() %}
+                    <a href="{{ row['spotifyURL'] }}" target="_blank" class="song-card">
+                        <img src="{{ row['albumCoverURL'] }}" alt="{{ row['trackName'] }} image" class="song-image">
                         <div class="song-card-details">
-                            <h3>{{ recommendation['name'] }}</h3>
-                            <p>{{ recommendation['artists'][0]['name'] }}</p>
-
+                            <h3>{{ row['trackName'] }}</h3>
+                            <p>
+                                {% for artist in row['artistNames']%}
+                                <span>{{ artist }}</span>{% if not loop.last %}, {% endif %}
+                                {% endfor %}
+                            </p>
                         </div>
                     </a>
                     {% endfor %}
+
 
                 </div>
             </div>

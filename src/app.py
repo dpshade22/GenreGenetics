@@ -109,6 +109,7 @@ cache_config = {
 app.config.from_mapping(cache_config)
 cache = Cache(app)
 
+
 # Set global variables
 def get_top_tracks_status():
     return session.get("top_tracks", False)
@@ -228,7 +229,10 @@ def songs(genre):
         ["trackName", "spotifyURL", "artistNames", "artistLinks", "albumCoverURL"]
     ].to_dict("records")
 
-    recommendations = user.getRecommendationsByGene(selectedDF, seed_genre=genre)
+    recommendations = user.getRecommendationsByGene(
+        selectedDF.reset_index(drop=True), seed_genre=genre
+    )
+
     promptForGPTMusicSummary = get_prompt_for_gpt_music_summary(
         top_tracks=top_tracks, genre=genre
     )
