@@ -158,6 +158,8 @@ def index():
             else user.getRecentlyPlayedForCard()
         )
 
+        print(sidebarCards)
+
         return render_template(
             "index.html",
             top_tracks=top_tracks,
@@ -232,22 +234,23 @@ def songs(genre):
     )
     gptSummaryDF = get_gpt_summary_dataframe(selectedDF)
     gptSummaryJSON = gptSummaryDF.to_json(orient="records")
-    print(gptSummaryJSON)
-    topTracksSummaryResp = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {
-                "role": "system",
-                "content": promptForGPTMusicSummary,
-            },
-            {
-                "role": "user",
-                "content": gptSummaryJSON,
-            },
-        ],
-    )
-    topTracksSummaryText = topTracksSummaryResp["choices"][0]["message"]["content"]
 
+    # topTracksSummaryResp = openai.ChatCompletion.create(
+    #     model="gpt-3.5-turbo",
+    #     messages=[
+    #         {
+    #             "role": "system",
+    #             "content": promptForGPTMusicSummary,
+    #         },
+    #         {
+    #             "role": "user",
+    #             "content": gptSummaryJSON,
+    #         },
+    #     ],
+    # )
+    # topTracksSummaryText = topTracksSummaryResp["choices"][0]["message"]["content"]
+
+    topTracksSummaryText = "Test"
     return render_template(
         "songs.html",
         genre=genre,

@@ -30,6 +30,11 @@ class UserGenes:
         self.recentTracksDF = self.getRecentlyPlayed()
         self.topTracksDF = self.getTopTracks()
 
+        # Add 'inLibrary' column
+        self.recentTracksDF["inLibrary"] = self.isInLibrary(self.recentTracksDF["id"])
+        self.topTracksDF["inLibrary"] = self.isInLibrary(self.topTracksDF["id"])
+
+        # Add audio features
         self.recentTracksDF = self.getAudioFeatures(self.recentTracksDF)
         self.topTracksDF = self.getAudioFeatures(self.topTracksDF)
 
@@ -91,6 +96,10 @@ class UserGenes:
 
         df = pd.DataFrame(data)
         return df
+
+    def isInLibrary(self, track_ids):
+        results = self.sp.current_user_saved_tracks_contains(tracks=track_ids)
+        return results
 
     # Audio features
     def getAudioFeatures(self, df):
@@ -217,43 +226,40 @@ class UserGenes:
         df["gene"] = df.apply(self._calculateGene, axis=1)
 
     def getRecentlyPlayedForCard(self, limit=50):
-        self.recentTracks = self.sp.current_user_recently_played(limit=limit)
-
-        def not_seen_and_add(seen, track, artist):
-            if (track, artist) not in seen:
-                seen.add((track, artist))
-                return True
-            return False
-
-        seen = set()
-        recentlyPlayedPretty = [
-            {
-                "name": item["track"]["name"],
-                "artist": item["track"]["artists"][0]["name"],
-                "url": item["track"]["external_urls"]["spotify"],
-                "gene": self._getGeneBySongID(item["track"]["id"]),
-                "image_url": item["track"]["album"]["images"][0]["url"],
-            }
-            for item in self.recentTracks["items"]
-            if not_seen_and_add(
-                seen, item["track"]["name"], item["track"]["artists"][0]["name"]
-            )
+        recentTracks = self.recentTracksDF[
+            ["trackName", "artistNames", "albumCoverURL", "spotifyURL", "inLibrary"]
         ]
-        return recentlyPlayedPretty
+        recentTracks.drop_duplicates(subset=("trackName", "artistNames"), inplace=True)
+        recentTracksList = recentTracks.to_dict("records")
+
+        return [
+            {
+                "name": track["trackName"],
+                "artist": ", ".join(track["artistNames"]),
+                "image_url": track["albumCoverURL"],
+                "url": track["spotifyURL"],
+                "is_in_library": track["inLibrary"],
+            }
+            for track in recentTracksList
+        ]
 
     def getTopTracksForCard(self, limit=50):
-        self.topTracks = self.sp.current_user_top_tracks(limit=limit)
-        topTracksPretty = [
-            {
-                "name": item["name"],
-                "artist": item["artists"][0]["name"],
-                "url": item["external_urls"]["spotify"],
-                "gene": self._getGeneBySongID(item["id"]),
-                "image_url": item["album"]["images"][0]["url"],
-            }
-            for item in self.topTracks["items"]
+        topTracks = self.topTracksDF[
+            ["trackName", "artistNames", "albumCoverURL", "spotifyURL", "inLibrary"]
         ]
-        return topTracksPretty
+
+        topTracksList = topTracks.to_dict("records")
+
+        return [
+            {
+                "name": track["trackName"],
+                "artist": ", ".join(track["artistNames"]),
+                "image_url": track["albumCoverURL"],
+                "url": track["spotifyURL"],
+                "is_in_library": track["inLibrary"],
+            }
+            for track in topTracksList
+        ]
 
     # Helper functions
     def _getGeneBySongID(self, song_id):

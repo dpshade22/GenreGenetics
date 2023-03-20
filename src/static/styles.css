@@ -263,6 +263,7 @@ a:hover {
 
 /* Neomorphic Song Cards */
 .song-card {
+    position: relative;
     display: flex;
     align-items: center;
     padding: 1rem;
@@ -273,6 +274,20 @@ a:hover {
 
     height: 4rem;
     /* Increase the height of the card */
+}
+
+/* .song-card:hover .in-library-indicator {
+    background-color: rgba(0, 255, 0, 0.1); */
+/* Soft green with 10% opacity */
+/* } */
+
+/* .song-card:hover .not-in-library-indicator { */
+/* background-color: rgba(255, 0, 0, 0.1);
+    /* Soft red with 10% opacity */
+/* }  */
+
+.library-indicator {
+    position: relative;
 }
 
 .album-card {
