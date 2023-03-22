@@ -7,11 +7,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spotify Genetics</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css">
 
     <link rel="shortcut icon" type="image/vnd.microsoft.icon" href="{{ url_for('favicon') }}">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -68,7 +70,7 @@
                         <div class="song-card-details">
                             <h3>{{ song.name }}</h3>
                             <p>{{ song.artist }}</p>
-                            <p>{{ song.gene }}</p>
+                            <p class="gene">{{ song.gene }}</p>
                         </div>
                     </a>
                     {% endfor %}

@@ -30,13 +30,16 @@ class UserGenes:
         self.recentTracksDF = self.getRecentlyPlayed()
         self.topTracksDF = self.getTopTracks()
 
-        # Add 'inLibrary' column
-        self.recentTracksDF["inLibrary"] = self.isInLibrary(self.recentTracksDF["id"])
-        self.topTracksDF["inLibrary"] = self.isInLibrary(self.topTracksDF["id"])
+         # Add columns to both data frames
+        self.recentTracksDF = self.addColumnsToDF(self.recentTracksDF)
+        self.topTracksDF = self.addColumnsToDF(self.topTracksDF)
 
-        # Add audio features
-        self.recentTracksDF = self.getAudioFeatures(self.recentTracksDF)
-        self.topTracksDF = self.getAudioFeatures(self.topTracksDF)
+
+    def addColumnsToDF(self, df):
+        df["inLibrary"] = self.isInLibrary(df["id"])
+        df = self.mergeAudioFeatures(df)
+        return df
+
 
     def getTopTracks(self, limit=50):
         topTrackIDs = []
@@ -102,15 +105,17 @@ class UserGenes:
         return results
 
     # Audio features
-    def getAudioFeatures(self, df):
+    def mergeAudioFeatures(self, df):
         audioFeatures = self.sp.audio_features(df["id"])
         self.audioFeaturesDF = pd.DataFrame(audioFeatures)
+        self.audioFeaturesDF.to_csv("audioFeatures.csv")
         df = pd.merge(df, self.audioFeaturesDF, on="id")
-        self._addGeneColumn(df)
+
+        self.addGeneColumn(df)
         return df
 
     # Gene calculation and analysis
-    def _calculateGene(self, row):
+    def calculateGene(self, row):
         energyGene = "H" if row["energy"] > 0.5 else "L"
         moodGene = "P" if row["mode"] > 0.49 else "N"
         tempoGene = "F" if row["tempo"] > 100 else "S"
@@ -125,7 +130,7 @@ class UserGenes:
             "acousticness": self.df["acousticness"].mean(),
         }
 
-        return self._calculateGene(avgDF)
+        return self.calculateGene(avgDF)
 
     def getGeneCounts(self):
         return (
@@ -224,17 +229,18 @@ class UserGenes:
         recommendationsDF = self.createTrackInfoDataFrame(
             list(pd.DataFrame(recommendations["tracks"])["id"])
         )
-        recommendationsDF["inLibrary"] = self.isInLibrary(recommendationsDF["id"])
+        
+        recommendationsDF = self.addColumnsToDF(recommendationsDF)
 
         return recommendationsDF
 
-    def _addGeneColumn(self, df):
-        df["gene"] = df.apply(self._calculateGene, axis=1)
+    def addGeneColumn(self, df):
+        df["gene"] = df.apply(self.calculateGene, axis=1)
 
     def getRecentlyPlayedForCard(self, limit=50):
         recentTracks = (
             self.recentTracksDF[
-                ["trackName", "artistNames", "albumCoverURL", "spotifyURL", "inLibrary"]
+                ["trackName", "artistNames", "albumCoverURL", "spotifyURL", "gene", "inLibrary"]
             ]
             .drop_duplicates(subset=("trackName", "artistNames"))
             .copy()
@@ -247,6 +253,7 @@ class UserGenes:
                 "artist": ", ".join(track["artistNames"]),
                 "image_url": track["albumCoverURL"],
                 "url": track["spotifyURL"],
+                "gene": track["gene"],
                 "is_in_library": track["inLibrary"],
             }
             for track in recentTracksList
@@ -271,7 +278,7 @@ class UserGenes:
         ]
 
     # Helper functions
-    def _getGeneBySongID(self, song_id):
+    def getGeneBySongID(self, song_id):
         audioFeatures = self.sp.audio_features([song_id])[0]
         avgDF = {
             "energy": audioFeatures["energy"],
@@ -279,5 +286,5 @@ class UserGenes:
             "tempo": audioFeatures["tempo"],
             "acousticness": audioFeatures["acousticness"],
         }
-        gene = self._calculateGene(avgDF)
+        gene = self.calculateGene(avgDF)
         return gene

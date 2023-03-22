@@ -110,13 +110,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const songGene = document.createElement('p');
             songGene.textContent = song.gene;
+            songGene.classList.add('gene');
+
 
             const libraryIndicator = document.createElement('i');
             if (song.is_in_library) {
-                libraryIndicator.classList.add('fas', 'fa-check-circle', 'in-library-indicator', 'library-indicator');
+                libraryIndicator.classList.add('fas', 'fa-check-circle', 'in-library-indicator', 'library-indicator', 'in-library');
                 libraryIndicator.title = "This song is in your library";
             } else {
-                libraryIndicator.classList.add('fas', 'fa-times-circle', 'not-in-library-indicator', 'library-indicator');
+                libraryIndicator.classList.add('fas', 'fa-times-circle', 'not-in-library-indicator', 'library-indicator', 'not-in-library');
                 libraryIndicator.title = "This song is not in your library";
             }
 

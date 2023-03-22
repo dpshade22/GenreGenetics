@@ -159,8 +159,6 @@ def index():
             else user.getRecentlyPlayedForCard()
         )
 
-        print(sidebarCards)
-
         return render_template(
             "index.html",
             top_tracks=top_tracks,
@@ -196,6 +194,7 @@ def sidebar_card_data():
     sidebar_cards = (
         user.getTopTracksForCard() if top_tracks else user.getRecentlyPlayedForCard()
     )
+
     return jsonify(sidebar_cards)
 
 
@@ -220,7 +219,6 @@ def select_top_tracks():
 @cache.cached()
 def songs(genre):
     top_tracks = get_top_tracks_status()
-    print(f"top_tracks: {top_tracks}")
     selectedDF = get_selected_dataframe(user, get_top_tracks_status())
     acronymExplanations = get_acronym_explanations()
     selectedDF = selectedDF[selectedDF["gene"] == genre]
@@ -232,6 +230,8 @@ def songs(genre):
     recommendations = user.getRecommendationsByGene(
         selectedDF.reset_index(drop=True), seed_genre=genre
     )
+
+    recommendations.to_csv("recommendations.csv")
 
     promptForGPTMusicSummary = get_prompt_for_gpt_music_summary(
         top_tracks=top_tracks, genre=genre

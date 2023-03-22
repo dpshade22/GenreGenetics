@@ -6,7 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ genre }} - Songs and Artists</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css">
+
 </head>
 
 <body>
@@ -58,19 +61,26 @@
                                 <span>{{ artist }}</span>{% if not loop.last %}, {% endif %}
                                 {% endfor %}
                             </p>
+                            <p class="gene">{{ row['gene'] }}</p>
+                            {% if row['inlibrary'] %}
+                            <i class="fas fa-times-circle in-library-indicator library-indicator in-library"
+                                title="This song is not in your library"></i>
+                            {% else %}
+                            <i class="fas fa-times-circle not-in-library-indicator library-indicator not-in-library"
+                                title="This song is not in your library"></i>
+                            {% endif %}
                         </div>
                     </a>
                     {% endfor %}
-
-
                 </div>
             </div>
+
         </div>
     </div>
 
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
+    <!-- <script>
         const options = {
             root: null,
             rootMargin: '0px',
@@ -88,7 +98,7 @@
         cards.forEach(card => {
             observer.observe(card);
         });
-    </script>
+    </script> -->
 
 </body>
 

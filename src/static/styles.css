@@ -272,9 +272,34 @@ a:hover {
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
     transition: transform 0.3s, box-shadow 0.3s;
 
-    height: 4rem;
+    height: 4.5rem;
     /* Increase the height of the card */
 }
+
+.gene {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    background-color: var(--primary-color);
+    color: #fff;
+    font-size: 0.8rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.3rem 0 10px 0;
+    font-style: italic;
+}
+
+/* 
+.library-indicator,
+.in-library::before {
+    color: green;
+
+}
+
+.library-indicator,
+.not-in-library::before {
+    color: red;
+
+} */
 
 .library-indicator {
     position: relative;
@@ -288,12 +313,12 @@ a:hover {
     transform: translateX(-50%);
     margin-left: 0.5rem;
     /* background-color: #333; */
-    color: var(--dark-color);
     border-radius: 5px;
     font-size: 14px;
     opacity: 0.5;
     transition: opacity 0.3s ease-in-out;
 }
+
 
 .library-indicator:hover::before {
     opacity: 1;
@@ -350,6 +375,15 @@ a:hover {
     font-size: 1.2rem;
 }
 
+.song-card:hover .in-library {
+    color: green;
+}
+
+.song-card:hover .not-in-library {
+    color: red;
+}
+
+
 .song-card:hover {
     transform: translateY(-5px);
     /* Add a slight lift effect on hover */
@@ -364,7 +398,7 @@ a:hover {
     text-align: left;
     padding-left: 1rem;
     padding-bottom: 1rem;
-    font-style: italic;
+    font-style: normal;
 }
 
 .song-card-details h3 {
