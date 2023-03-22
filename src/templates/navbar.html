@@ -1,6 +1,8 @@
-<h1
+<!-- <h1
     style="background-color: var(--dark-color);   transition: background-color 1s ease-in-out; color: var(--primary-color);">
-    {{ title }}</h1>
+    {{ title }}</h1> -->
+<img src="{{ url_for('static', filename='./logo.svg') }}" alt=""
+    style="display: block; margin: 2rem auto 0 auto; height: 6rem;">
 <div class="navbar">
     <a href="{{ url_for('index') }}" class="navbar-item">Home</a>
     <span class="navbar-spacer">&emsp;&emsp;|&emsp;&emsp; </span>
