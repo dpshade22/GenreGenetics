@@ -1,7 +1,7 @@
 /* General styles */
 
 
-:root {
+/* :root {
     --primary-color: #121212;
     --off-primary-color: #d39393;
     --white: #ffffff;
@@ -10,19 +10,19 @@
     --middle-box-shadow: rgba(129, 129, 129, 1);
     --opposing-box-shadow: rgba(187, 187, 187, 0.1);
     --font-family: 'Oswald', sans-serif;
-}
+} */
 
 
 /* ALTERNATE SCHEME */
-/* :root {
+:root {
     --primary-color: #990000;
-    --off-primary-color: #3eaf0a98;
+    --off-primary-color: #00CA65;
     --white: #ffffff;
-    --off-white: #ffffd2;
+    --off-white: #ffffff;
     --primary-box-shadow: rgba(153, 0, 0, 0.4);
     --opposing-box-shadow: rgba(255, 255, 255, 0.1);
     --font-family: 'Roboto', sans-serif;
-} */
+}
 
 /* DARK MODE */
 /* :root {
