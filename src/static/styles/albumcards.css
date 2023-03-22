@@ -18,6 +18,7 @@
     --min-font-size: 16px;
     --max-font-size: 20px;
     font-size: var(--min-font-size);
+    color: var(--off-primary-color);
 }
 
 .album-card-details p {
