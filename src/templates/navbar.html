@@ -1,7 +1,10 @@
-<!-- navbar.html -->
 <div class="navbar">
-    <a href="{{ url_for('index') }}" class="navbar-item">Home</a>
-    <span class="navbar-spacer">&emsp;&emsp;|&emsp;&emsp; </span>
-    <!-- <a href="{{ url_for('chatbot') }}">Chat with our custom chatbot</a> -->
-    <a href="{{ url_for('about') }}" class="navbar-item">About</a>
+    <input type="checkbox" id="navbar-toggle-checkbox">
+    <label for="navbar-toggle-checkbox" class="navbar-toggle">
+        <span class="navbar-toggle-icon"></span>
+    </label>
+    <div class="navbar-menu">
+        <a href="{{ url_for('index') }}" class="navbar-item">Home</a>
+        <a href="{{ url_for('about') }}" class="navbar-item">About</a>
+    </div>
 </div>

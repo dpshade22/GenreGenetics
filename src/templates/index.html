@@ -2,26 +2,14 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spotify Genetics</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
-
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css">
-
-    <link rel="shortcut icon" type="image/vnd.microsoft.icon" href="{{ url_for('favicon') }}">
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
+{% include 'head.html' %}
 
 <body>
     <div id="loading-screen">
         <div class="spinner"></div>
     </div>
-    <h1>Your Spotify Genetics</h1>
     {% include 'navbar.html' %}
+    <h1 class="neumorphic-title">Spotify Genetics</h1>
     <div class="chart-container">
         <div class="chart-wrapper">
             <p>{{ gptSummary }}</p>

@@ -1,0 +1,132 @@
+.song-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    margin: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s, box-shadow 0.3s;
+
+    height: 4.5rem;
+    /* Increase the height of the card */
+}
+
+
+.song-card:hover .library-indicator::before {
+    opacity: 1;
+}
+
+
+.song-card-details {
+    text-align: center;
+}
+
+.song-card-details h3 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.song-card:hover .in-library {
+    opacity: 1;
+}
+
+.song-card:hover .not-in-library {
+    opacity: 1;
+}
+
+
+.song-card:hover {
+    transform: translateY(-5px);
+    /* Add a slight lift effect on hover */
+    background-color: rgba(0, 0, 0, 0.03);
+
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+    /* Increase the shadow size on hover */
+}
+
+.song-card-details {
+    flex-grow: 1;
+    text-align: left;
+    padding-left: 1rem;
+    padding-bottom: 1rem;
+    font-style: normal;
+}
+
+.song-card-details h3 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.song-card-details p {
+    margin: 0;
+    font-size: 1rem;
+    /* Increase the font size of the artist and preference */
+}
+
+.song-image {
+    width: 60px;
+    border-radius: 6%;
+}
+
+.song-card-details h3,
+.song-card-details p {
+    margin: 2px;
+    /* Adjust the value to add more or less spacing */
+}
+
+.song-card-details h3 {
+    margin-top: 1.4rem;
+}
+
+.song-row {
+    cursor: pointer;
+}
+
+.song-row:hover {
+    background-color: #f2f2f2;
+}
+
+/* Neomorphic Song Cards */
+.gene {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    background-color: var(--primary-color);
+    color: #fff;
+    font-size: 0.8rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.3rem 0 10px 0;
+    font-style: italic;
+}
+
+
+.library-indicator,
+.in-library::before {
+    color: green;
+
+}
+
+.library-indicator,
+.not-in-library::before {
+    color: red;
+
+}
+
+.library-indicator {
+    position: relative;
+}
+
+.library-indicator::before {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-left: 0.5rem;
+    /* background-color: #333; */
+    border-radius: 5px;
+    font-size: 14px;
+    opacity: 0.5;
+    transition: opacity 0.3s ease-in-out;
+}

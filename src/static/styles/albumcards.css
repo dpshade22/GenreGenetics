@@ -1,0 +1,49 @@
+.album-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.album-card img {
+    border-radius: 2%;
+    max-width: 100%;
+}
+
+.album-card-details h3 {
+    white-space: wrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    --min-font-size: 16px;
+    --max-font-size: 20px;
+    font-size: var(--min-font-size);
+}
+
+.album-card-details p {
+    margin: 0;
+    color: #666;
+}
+
+.album-image {
+    width: 20rem;
+}
+
+.recently-played-album-container {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+    margin-top: 1.5rem;
+    height: 80vh;
+    padding: 2rem;
+    border-width: 1px;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    grid-gap: 3rem;
+    padding: 2rem;
+    border-width: 1px;
+}

@@ -1,0 +1,113 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 60px;
+    background-color: #ffffff;
+    padding: 0 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.navbar::after {
+    content: '';
+    display: block;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 50%;
+    height: 100%;
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.1), -5px -5px 15px rgba(255, 255, 255, 0.1);
+    pointer-events: none;
+    z-index: -1;
+}
+
+.navbar-item {
+    color: #333;
+    font-weight: bold;
+    text-decoration: none;
+    margin-right: 20px;
+    transition: color 0.2s ease;
+}
+
+.navbar-item:hover {
+    color: #666;
+}
+
+.navbar-toggle {
+    display: none;
+    align-items: center;
+    cursor: pointer;
+    height: 100%;
+}
+
+.navbar-toggle-icon {
+    display: inline-block;
+    width: 24px;
+    height: 2px;
+    background-color: #333;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.navbar-toggle-icon::before,
+.navbar-toggle-icon::after {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background-color: #333;
+}
+
+.navbar-toggle-icon::before {
+    top: -8px;
+}
+
+.navbar-toggle-icon::after {
+    bottom: -8px;
+}
+
+#navbar-toggle-checkbox:checked~.navbar-menu {
+    display: flex;
+}
+
+.navbar-menu {
+    display: flex;
+    align-items: center;
+    transition: all 0.2s ease;
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        justify-content: flex-end;
+    }
+
+    .navbar-toggle {
+        display: flex;
+    }
+
+    .navbar-menu {
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-end;
+        position: absolute;
+        top: 60px;
+        right: 0;
+        padding: 10px;
+        transform-origin: top right;
+        transform: scale(0);
+        background-color: #ffffff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    #navbar-toggle-checkbox:checked~.navbar-menu {
+        display: flex;
+        transform: scale(1);
+    }
+
+    .navbar-item {
+        margin-bottom: 10px;
+    }
+}

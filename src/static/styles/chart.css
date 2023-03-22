@@ -1,0 +1,139 @@
+.chart-container {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    /* margin-bottom: 1.5rem; */
+    margin-top: 2rem;
+}
+
+.chart-wrapper {
+    flex: 1;
+    flex-basis: 70%;
+    max-width: 900px;
+    margin-right: 0;
+    margin-left: 0;
+    margin-bottom: 1.5rem;
+}
+
+.chart-wrapper p {
+    font-size: 1rem;
+    font-style: italic;
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.bottom-chart {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#chart-form {
+    position: relative;
+    color: white;
+    color: white;
+    float: right;
+    padding-top: 4rem;
+}
+
+#chart-form input {
+    position: absolute;
+    left: -9999px;
+}
+
+/* Style the label */
+#chart-form label {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    font-weight: 200;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 0.375em;
+    color: var(--primary-color);
+}
+
+/* Style the label text */
+#chart-form span {
+    display: flex;
+    align-items: center;
+    padding: 0.375em 0.75em 0.375em 0.375em;
+    border-radius: 99em;
+    transition: 0.25s ease;
+}
+
+/* Style the radio button */
+#chart-form span::before {
+    display: flex;
+    flex-shrink: 0;
+    content: "";
+    background-color: #fff;
+    width: 1.5em;
+    height: 1.5em;
+    border-radius: 50%;
+    margin-right: 0.375em;
+    transition: 0.25s ease;
+    box-shadow: inset 0 0 0 0.125em var(--primary-color);
+}
+
+/* Style the checked radio button */
+#chart-form input:checked+span::before {
+    background-color: var(--secondary-color);
+}
+
+/* Style the checked radio button label */
+#chart-form input:checked+span {
+    background-color: mix(var(--accent-color), var(--primary-color), 84%);
+}
+
+@media (max-width: 768px) {
+    .chart-wrapper {
+        margin-right: 0;
+    }
+}
+
+.radio-group {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Custom submit button */
+.custom-submit {
+    position: absolute;
+    left: -4rem;
+    top: 5.5rem;
+    background-color: var(--primary-color);
+    border: none;
+    color: white;
+    padding: 1rem 1rem;
+    text-align: center;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 99em;
+    transition: 0.25s ease;
+    height: 1.8rem;
+    min-width: 3rem;
+    max-width: 5rem;
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+}
+
+.custom-submit:hover {
+    opacity: 0.8;
+}
+
+.custom-submit:active {
+    background-color: mix(var(--primary-color), var(--accent-color), 74%);
+    box-shadow: 0 0.125em 0.125em rgba(0, 0, 0, 0.2);
+    transform: translateY(0.25em);
+}
+
+.custom-submit:focus {
+    outline: none;
+    box-shadow: 0 0 0 0.125em var(--accent-color);
+}
