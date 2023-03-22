@@ -3,7 +3,7 @@
     display: flex;
     align-items: center;
     padding: 1rem;
-    margin: 2rem 1rem;
+    margin: 1.5rem 0rem 1.5rem 0rem;
     border-radius: 10px;
     box-shadow: 0 6px 12px var(--primary-box-shadow);
     transition: transform 0.3s, box-shadow 0.3s;
@@ -40,11 +40,9 @@
 
 .song-card:hover {
     transform: translateY(-5px);
-    /* Add a slight lift effect on hover */
     background-color: var(--off-primary-color);
-    /* color: var(--off-white); */
-    box-shadow: 0 0px 30px var(--middle-box-shadow);
-    /* Increase the shadow size on hover */
+    box-shadow: 0 0px 30px var(--white);
+    color: var(--white);
 }
 
 .song-card-details {
@@ -68,6 +66,10 @@
     /* Show ellipses instead of overflowed text */
 }
 
+.song-card:hover * {
+    color: var(--white);
+}
+
 .song-card-details p {
     margin: 0;
     font-size: 1rem;
@@ -79,20 +81,12 @@
 }
 
 
-.song-row {
-    cursor: pointer;
-}
-
-.song-row:hover {
-    background-color: var(--primary-color);
-}
-
 .gene {
     position: absolute;
     bottom: -1.73rem;
     right: 0px;
     background-color: var(--off-primary-color);
-    /* color: var(--off-white); */
+    color: var(--off-white);
     font-size: 0.8rem !important;
     padding: 0.5rem 0.25rem;
     border-radius: 0 0.3rem 0 10px;
