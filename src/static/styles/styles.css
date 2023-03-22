@@ -1,20 +1,20 @@
 /* General styles */
 
 
-/* :root {
+:root {
     --primary-color: #121212;
     --off-primary-color: #d39393;
     --white: #ffffff;
-    --off-white: #E5E5E5;
+    --off-white: #ffffff;
     --primary-box-shadow: rgba(0, 0, 0, 0.4);
     --middle-box-shadow: rgba(129, 129, 129, 1);
     --opposing-box-shadow: rgba(187, 187, 187, 0.1);
     --font-family: 'Oswald', sans-serif;
-} */
+}
 
 
 /* ALTERNATE SCHEME */
-:root {
+/* :root {
     --primary-color: #990000;
     --off-primary-color: #3eaf0a98;
     --white: #ffffff;
@@ -22,7 +22,7 @@
     --primary-box-shadow: rgba(153, 0, 0, 0.4);
     --opposing-box-shadow: rgba(255, 255, 255, 0.1);
     --font-family: 'Roboto', sans-serif;
-}
+} */
 
 /* DARK MODE */
 /* :root {

@@ -67,7 +67,7 @@
 }
 
 .song-card:hover * {
-    color: var(--white);
+    color: var(--off-white);
 }
 
 .song-card-details p {
