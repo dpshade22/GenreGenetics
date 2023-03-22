@@ -237,21 +237,6 @@ def songs(genre):
     gptSummaryDF = get_gpt_summary_dataframe(selectedDF)
     gptSummaryJSON = gptSummaryDF.to_json(orient="records")
 
-    # topTracksSummaryResp = openai.ChatCompletion.create(
-    #     model="gpt-3.5-turbo",
-    #     messages=[
-    #         {
-    #             "role": "system",
-    #             "content": promptForGPTMusicSummary,
-    #         },
-    #         {
-    #             "role": "user",
-    #             "content": gptSummaryJSON,
-    #         },
-    #     ],
-    # )
-    # topTracksSummaryText = topTracksSummaryResp["choices"][0]["message"]["content"]
-
     topTracksSummaryText = "Test"
     return render_template(
         "songs.html",
@@ -261,6 +246,38 @@ def songs(genre):
         recommendations=recommendations,
         musicTasteSummary=topTracksSummaryText,
     )
+
+
+@app.route("/generate_summary", methods=["POST"])
+def generate_summary():
+    top_tracks = request.form.get("top_tracks") == "True"
+    selectedDF = get_selected_dataframe(user, top_tracks)
+
+    promptForGPTMusicSummary = get_prompt_for_gpt_music_summary(top_tracks)
+
+    # Construct the messages for the GPT-3.5 request
+    messages = [
+        {
+            "role": "system",
+            "content": promptForGPTMusicSummary,
+        },
+        {
+            "role": "user",
+            "content": f"Here is a list of my {'top listened to tracks' if top_tracks else 'recently listened to tracks'}",
+        },
+    ]
+
+    # Add the selected dataframe to the messages
+    messages[1]["content"] += selectedDF.to_json(orient="records")
+
+    # Send the request to GPT-3.5
+    topTracksSummaryResp = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=messages,
+    )
+    topTracksSummaryText = topTracksSummaryResp["choices"][0]["message"]["content"]
+
+    return jsonify({"summary": topTracksSummaryText})
 
 
 if __name__ == "__main__":

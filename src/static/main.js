@@ -35,7 +35,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const gradient = chartElement.getContext('2d').createLinearGradient(0, 0, 1750, 0);
         gradient.addColorStop(0, '#990000'); // Bright yellow color
-        gradient.addColorStop(0.8, '#00CA65'); // Bright teal color
+        gradient.addColorStop(0.46, '#00CA65'); // Bright teal color
+        gradient.addColorStop(0.99, '#00CA65'); // Bright teal color
 
         chart = new Chart(chartElement, {
             type: 'bar',
