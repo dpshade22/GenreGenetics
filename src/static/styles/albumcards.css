@@ -3,6 +3,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    text-align: center;
 }
 
 .album-card img {
@@ -21,7 +22,7 @@
 
 .album-card-details p {
     margin: 0;
-    color: #666;
+    color: var(--light-color);
 }
 
 .album-image {

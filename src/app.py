@@ -112,7 +112,7 @@ cache = Cache(app)
 
 # Set global variables
 def get_top_tracks_status():
-    return session.get("top_tracks", False)
+    return False
 
 
 @app.route("/", methods=["GET", "POST"])

@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const chartElement = document.getElementById('myChart');
         chartElement.width = 2000;
         chartElement.height = 1200;
-        const topTracks = document.querySelector('input[name="top_tracks"]:checked').value;
+        const topTracks = false;
         console.log(`/chart_data?top_tracks=${topTracks}`)
         const response = await fetch(`/chart_data?top_tracks=${topTracks}`);
         const chartData = await response.json();
@@ -34,8 +34,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const maxCount = Math.max(...counts);
 
         const gradient = chartElement.getContext('2d').createLinearGradient(0, 0, 1750, 0);
-        gradient.addColorStop(0, 'rgb(20, 70, 70)');
-        gradient.addColorStop(0.99, 'rgb(239, 221, 141)');
+        gradient.addColorStop(0, '#faedcd'); // Bright teal color
+        gradient.addColorStop(0.99, '#d4a373'); // Bright yellow color
 
         chart = new Chart(chartElement, {
             type: 'bar',

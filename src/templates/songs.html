@@ -1,32 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ genre }} - Songs and Artists</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
-
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css">
-
-</head>
+{% include 'head.html' %}
 
 <body>
-    <div>
-        <h1 style="background-color: black;   transition: background-color 1s ease-in-out;">Current Genre Gene: {{
-            genre }}</h1>
-        <div class="navbar" style="background-color: black;">
-            <a href="{{ url_for('index') }}" class="navbar-item">Home</a>
-            <span class="navbar-spacer">&emsp;&emsp;|&emsp;&emsp; </span>
-            <a href="{{ url_for('about') }}" class="navbar-item">About</a>
-        </div>
-    </div>
+    {% with title = 'Current Genre Gene: ' ~ genre %}
+    {% include 'navbar.html' %}
+    {% endwith %}
     <div class="recently-played-album-container">
         <div style="width: 40vw; padding-bottom: 2rem;">
-            <h2 style="margin-bottom: 0.5rem; ">{{ genre }} Songs and Artists</h2>
+            <h2 style="margin-bottom: 0.5rem; color: var(--primary-color);">{{ genre }} Songs and Artists</h2>
             {% if musicTasteSummary %}
-            <p style="text-align: left; padding: 0.5rem;"><em>{{ musicTasteSummary }}</em></p>
+            <p style="text-align: left; padding: 0.5rem; color: var(--primary-color);"><em>{{ musicTasteSummary }}</em>
+            </p>
             {% endif %}
             <div class="grid-container">
                 {% for song in songs %}
@@ -35,10 +21,10 @@
                         <img src="{{ song.albumCoverURL }}" alt="{{ song.trackName }} album cover" class="album-image">
                     </a>
                     <div class="album-card-details">
-                        <a href="{{song.spotifyURL }}" target="_blank">
+                        <a href="{{song.spotifyURL }}" target="_blank" style="color: var(--primary-color);">
                             <h3>{{ song.trackName }}</h3>
                         </a>
-                        <a href=" {{ song.artistLinks[0] }}" target="_blank">
+                        <a href=" {{ song.artistLinks[0] }}" target="_blank" style="color: var(--primary-color);">
                             <p>{{ song.artistNames[0] }}</p>
                         </a>
                     </div>
@@ -47,8 +33,9 @@
             </div>
         </div>
         <div class=" sidebar-container">
-            <h2>New Recommendations</h2>
-            <p style="font-style: italic;">Recommendations made based on the songs on the left</p>
+            <h2 style="color: var(--primary-color);">New Recommendations</h2>
+            <p style="font-style: italic; color: var(--primary-color);">Recommendations made based on the songs on the
+                left</p>
             <div class="recently-played-wrapper" id="recommendations-container">
                 <div class="recently-played-cards" id="recently-played-cards">
                     {% for index, row in recommendations.iterrows() %}
@@ -64,7 +51,7 @@
                             <p class="gene">{{ row['gene'] }}</p>
                             {% if row['inlibrary'] %}
                             <i class="fas fa-times-circle in-library-indicator library-indicator in-library"
-                                title="This song is not in your library"></i>
+                                title=" This song is not in your library"></i>
                             {% else %}
                             <i class="fas fa-times-circle not-in-library-indicator library-indicator not-in-library"
                                 title="This song is not in your library"></i>
@@ -86,14 +73,14 @@
             rootMargin: '0px',
             threshold: 0.3
         };
-
+    
         const observer = new IntersectionObserver(entries => {
             entries.forEach(entry => {
                 if (entry.intersectionRatio < 0.3) return;
                 entry.target.classList.add('fade-in');
             });
         }, options);
-
+    
         const cards = document.querySelectorAll('.song-card');
         cards.forEach(card => {
             observer.observe(card);

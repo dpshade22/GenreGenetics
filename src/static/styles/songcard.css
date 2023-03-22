@@ -3,24 +3,28 @@
     display: flex;
     align-items: center;
     padding: 1rem;
-    margin: 1rem;
+    margin: 2rem 1rem;
     border-radius: 10px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 6px 12px var(--dark-box-shadow);
     transition: transform 0.3s, box-shadow 0.3s;
 
     height: 4.5rem;
-    /* Increase the height of the card */
 }
-
 
 .song-card:hover .library-indicator::before {
     opacity: 1;
 }
 
-
 .song-card-details {
-    text-align: center;
+    flex-grow: 1;
+    text-align: left;
+    padding-left: 1rem;
+    padding-bottom: 1rem;
+    font-style: normal;
+    height: 80px;
+    /* Add a fixed height */
 }
+
 
 .song-card-details h3 {
     margin: 0;
@@ -35,13 +39,12 @@
     opacity: 1;
 }
 
-
 .song-card:hover {
     transform: translateY(-5px);
     /* Add a slight lift effect on hover */
-    background-color: rgba(0, 0, 0, 0.03);
-
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+    background-color: var(--off-white);
+    /* color: var(--off-white); */
+    box-shadow: 0 0px 30px var(--white);
     /* Increase the shadow size on hover */
 }
 
@@ -51,17 +54,24 @@
     padding-left: 1rem;
     padding-bottom: 1rem;
     font-style: normal;
+    width: 4rem;
 }
 
 .song-card-details h3 {
-    margin: 0;
+    margin-top: 1.4rem;
     font-size: 1rem;
+    color: var(--primary-color);
+    white-space: nowrap;
+    /* Prevent line breaks */
+    overflow: hidden;
+    /* Hide overflowed text */
+    text-overflow: ellipsis;
+    /* Show ellipses instead of overflowed text */
 }
 
 .song-card-details p {
     margin: 0;
     font-size: 1rem;
-    /* Increase the font size of the artist and preference */
 }
 
 .song-image {
@@ -69,52 +79,40 @@
     border-radius: 6%;
 }
 
-.song-card-details h3,
-.song-card-details p {
-    margin: 2px;
-    /* Adjust the value to add more or less spacing */
-}
-
-.song-card-details h3 {
-    margin-top: 1.4rem;
-}
 
 .song-row {
     cursor: pointer;
 }
 
 .song-row:hover {
-    background-color: #f2f2f2;
+    background-color: var(--primary-color);
 }
 
-/* Neomorphic Song Cards */
 .gene {
     position: absolute;
-    bottom: -2px;
-    right: -2px;
-    background-color: var(--primary-color);
-    color: #fff;
-    font-size: 0.8rem;
-    padding: 0.2rem 0.5rem;
-    border-radius: 0.3rem 0 10px 0;
-    font-style: italic;
+    bottom: -1.76rem;
+    right: 0px;
+    background-color: var(--off-white);
+    /* color: var(--off-white); */
+    font-size: 0.8rem !important;
+    padding: 0.5rem 0.25rem;
+    border-radius: 0 0.3rem 0 10px;
+    font-style: normal;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: translateY(-50%);
+    height: 4.5rem;
+    /* Add a fixed height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 
-.library-indicator,
-.in-library::before {
-    color: green;
-
-}
-
-.library-indicator,
-.not-in-library::before {
-    color: red;
-
-}
 
 .library-indicator {
     position: relative;
+    color: var(--primary-color);
 }
 
 .library-indicator::before {
@@ -124,9 +122,17 @@
     left: 50%;
     transform: translateX(-50%);
     margin-left: 0.5rem;
-    /* background-color: #333; */
+    /* background-color: var(--primary-color); */
     border-radius: 5px;
     font-size: 14px;
     opacity: 0.5;
     transition: opacity 0.3s ease-in-out;
+}
+
+.in-library {
+    margin-top: 1.1rem;
+}
+
+.not-in-library {
+    margin-top: 1.1rem;
 }

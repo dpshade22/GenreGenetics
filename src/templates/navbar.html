@@ -1,10 +1,8 @@
+<h1
+    style="background-color: var(--dark-color);   transition: background-color 1s ease-in-out; color: var(--primary-color);">
+    {{ title }}</h1>
 <div class="navbar">
-    <input type="checkbox" id="navbar-toggle-checkbox">
-    <label for="navbar-toggle-checkbox" class="navbar-toggle">
-        <span class="navbar-toggle-icon"></span>
-    </label>
-    <div class="navbar-menu">
-        <a href="{{ url_for('index') }}" class="navbar-item">Home</a>
-        <a href="{{ url_for('about') }}" class="navbar-item">About</a>
-    </div>
+    <a href="{{ url_for('index') }}" class="navbar-item">Home</a>
+    <span class="navbar-spacer">&emsp;&emsp;|&emsp;&emsp; </span>
+    <a href="{{ url_for('about') }}" class="navbar-item">About</a>
 </div>

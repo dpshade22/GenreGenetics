@@ -8,9 +8,10 @@
     <div id="loading-screen">
         <div class="spinner"></div>
     </div>
+
+    {% with title = 'Spotify Genetics' %}
     {% include 'navbar.html' %}
-    <h1 class="neumorphic-title">Spotify Genetics</h1>
-    <div class="chart-container">
+    {% endwith %} <div class="chart-container">
         <div class="chart-wrapper">
             <p>{{ gptSummary }}</p>
             <canvas id="myChart"></canvas>
@@ -27,21 +28,6 @@
                         <li><strong>Instrumentation:</strong> Electronic (E) / Acoustic (A)</li>
                     </ul>
                 </div>
-                <form id="chart-form">
-                    <div class="radio-group">
-                        <label class="radio">
-                            <input id="top-tracks-form-true" type="radio" name="top_tracks" value="True" {% if
-                                session["top_tracks"] %}checked{% endif %}>
-                            <span>View Top Tracks</span>
-                        </label>
-                        <label class="radio">
-                            <input id="top-tracks-form-false" type="radio" name="top_tracks" value="False" {% if not
-                                session["top_tracks"] %}checked{% endif %}>
-                            <span>View Recent Tracks</span>
-                        </label>
-                    </div>
-                    <button type="submit" class="custom-submit">Submit</button>
-                </form>
             </div>
         </div>
         <div class="sidebar-container">

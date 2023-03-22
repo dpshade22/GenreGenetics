@@ -1,19 +1,28 @@
 /* General styles */
-
+/* :root {
+    --primary-color: #FFFFFF;
+    --white: #d4a373;
+    --off-white: #121212;
+    --primary-color: #E5E5E5;
+    --font-family: 'Oswald', sans-serif;
+} */
 :root {
-    --primary-color: rgba(19, 69, 69, 1);
-    --secondary-color: #144646;
-    --light-color: rgba(229, 229, 229, 1);
-    --dark-color: rgba(51, 51, 51, 1);
+    --primary-color: #121212;
+    --white: #ffffff;
+    --off-white: #E5E5E5;
+    --dark-box-shadow: rgba(0, 0, 0, 0.2);
+    --light-box-shadow: rgba(187, 187, 187, 0.3);
     --font-family: 'Oswald', sans-serif;
 }
+
 
 html,
 body {
     margin: 0;
     padding: 0;
     font-family: var(--font-family);
-    color: var(--dark-color);
+    color: var(--primary-color);
+    background-color: var(--white);
 }
 
 a {
@@ -24,19 +33,6 @@ a {
 a:hover {
     text-decoration: underline;
 }
-
-.neumorphic-title {
-    display: inline-block;
-    background-color: white;
-    color: var(--primary-color);
-    font-size: 2rem;
-    padding: 0.5rem 1rem;
-    border-radius: 10px;
-    /* Adjust the box-shadow values as needed to achieve the desired effect */
-}
-
-
-
 
 
 /* Headings */
@@ -57,13 +53,9 @@ h1 {
     padding-top: 2.15rem;
     padding-bottom: 0;
     /* Add some padding to make the text look better */
-    color: var(--dark-color);
-    /* Change the text color to white for better contrast */
-    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.1),
-        -5px -5px 15px rgba(255, 255, 255, 0.5);
+    color: var(--primary-color);
+
 }
-
-
 
 h2 {
     font-size: 1.5rem;
@@ -81,6 +73,7 @@ p,
 em {
     margin-bottom: 1rem;
     line-height: 1.5;
+    color: var(--primary-color);
 }
 
 ul,
@@ -99,25 +92,27 @@ input[type="text"],
 textarea {
     width: 100%;
     padding: 0.5rem;
-    border: 1px solid var(--light-color);
+    border: 1px solid var(--primary-color);
     border-radius: 0.25rem;
     margin-bottom: 1rem;
     resize: none;
+    background-color: var(--off-white);
+    color: var(--primary-color);
 }
 
 input[type="submit"] {
     display: block;
     padding: 0.5rem 1rem;
     border-radius: 0.25rem;
-    background-color: var(--secondary-color);
-    color: white;
+    background-color: var(--white);
+    color: var(--off-white);
     text-align: center;
     transition: background-color 0.2s ease;
     cursor: pointer;
 }
 
 input[type="submit"]:hover {
-    background-color: darken(var(--secondary-color), 10%);
+    background-color: var(--primary-color);
 }
 
 /* Tables */
@@ -132,23 +127,23 @@ th,
 td {
     padding: 0.75rem;
     text-align: left;
-    border-bottom: 1px solid var(--light-color);
+    border-bottom: 1px solid var(--primary-color);
 }
 
 th {
     font-weight: bold;
-    background-color: var(--secondary-color);
-    color: white;
+    background-color: var(--white);
+    color: var(--off-white);
 }
 
 td {
     font-style: italic;
+    color: var(--primary-color);
 }
 
 tr:hover {
-    background-color: var(--light-color);
+    background-color: var(--primary-color);
 }
-
 
 /* Containers */
 
@@ -156,15 +151,16 @@ tr:hover {
     max-width: 800px;
     margin: 0 auto;
     padding: 1rem;
+    background-color: var(--off-white);
+    color: var(--primary-color);
 }
 
 .category-explanations {
     margin-top: 10px;
-    color: #777;
+    color: var(--primary-color);
     line-height: 0.8rem;
     width: 25rem;
 }
-
 
 .sidebar-container {
     flex: 1;
@@ -183,31 +179,24 @@ tr:hover {
     display: inline-block;
     padding: 0.5rem 1rem;
     border-radius: 0.25rem;
-    background-color: var(--secondary-color);
-    color: white;
+    background-color: var(--white);
+    color: var(--off-white);
     text-align: center;
     transition: background-color 0.2s ease;
 }
 
 .button:hover {
-    background-color: darken(var(--secondary-color), 10%);
+    background-color: var(--off-white);
     cursor: pointer;
 }
 
-
-
-
-
-
 /* Footer */
 .footer {
-    background-color: var(--secondary-color);
-    color: white;
+    background-color: #152A3F;
+    color: var(--primary-color);
     text-align: center;
     padding: 1rem;
 }
-
-
 
 /* Media queries */
 
@@ -215,6 +204,7 @@ tr:hover {
     .chart-wrapper {
         margin-right: 0;
     }
+
 
     .container {
         max-width: 100%;
@@ -240,15 +230,18 @@ tr:hover {
     textarea {
         width: 100%;
         padding: 0.5rem;
-        border: 1px solid var(--light-color);
+        border: 1px solid var(--primary-color);
         border-radius: 0.25rem;
         margin-bottom: 1rem;
         resize: none;
+        background-color: #1D1D1D;
+        color: var(--primary-color);
     }
 
-    .button {
+    css .button {
         display: block;
         width: 100%;
         margin-bottom: 1rem;
     }
+
 }
