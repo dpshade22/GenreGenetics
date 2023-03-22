@@ -231,8 +231,6 @@ def songs(genre):
         selectedDF.reset_index(drop=True), seed_genre=genre
     )
 
-    recommendations.to_csv("recommendations.csv")
-
     promptForGPTMusicSummary = get_prompt_for_gpt_music_summary(
         top_tracks=top_tracks, genre=genre
     )
