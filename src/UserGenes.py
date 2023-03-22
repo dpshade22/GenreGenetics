@@ -33,6 +33,7 @@ class UserGenes:
         # Add columns to both data frames
         self.recentTracksDF = self.addColumnsToDF(self.recentTracksDF)
         self.topTracksDF = self.addColumnsToDF(self.topTracksDF)
+        self.recentTracksDF.to_csv("recentTracks.csv")
 
     def addColumnsToDF(self, df):
         df["inLibrary"] = self.isInLibrary(df["id"])
@@ -113,11 +114,39 @@ class UserGenes:
 
     # Gene calculation and analysis
     def calculateGene(self, row):
-        energyGene = "H" if row["energy"] > 0.5 else "L"
-        moodGene = "P" if row["mode"] > 0.49 else "N"
-        tempoGene = "F" if row["tempo"] > 100 else "S"
-        instrumentationGene = "E" if row["acousticness"] < 0.5 else "A"
-        return f"{energyGene}{moodGene}{tempoGene}{instrumentationGene}"
+        # Calculate the mood score using valence and mode
+        valence_weight = 0.8
+        mode_weight = 0.2
+        mood_score = valence_weight * row["valence"] + mode_weight * row["mode"]
+        moodGene = "H" if mood_score > 0.5 else "S"
+
+        paceGene = "F" if row["tempo"] > 100 else "L"
+
+        # Calculate the complexity score using the selected features
+        complexity_score = (
+            -0.15 * row["instrumentalness"]
+            + 0.25 * row["speechiness"]
+            - 0.15 * row["acousticness"]
+            + 0.2 * row["energy"]
+            + 0.1 * row["danceability"]
+            + 0.15
+            * row["tempo"]
+            / 200  # normalize tempo to [0, 1] by dividing by an approximate maximum value
+            + 0.2
+            * (
+                1 if row["time_signature"] != 4 else 0
+            )  # assign complexity based on time_signature
+        )
+
+        # Normalize the complexity score between 0 and 1
+        complexity_score = (complexity_score + 1) / 2
+
+        # Adjust the threshold to classify tracks as dense
+        textureGene = "D" if complexity_score > 0.55 else "M"
+
+        vocalsGene = "V" if row["instrumentalness"] < 0.5 else "I"
+
+        return f"{moodGene}{paceGene}{textureGene}{vocalsGene}"
 
     def getOverallGenes(self):
         avgDF = {
