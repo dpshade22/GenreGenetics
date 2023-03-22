@@ -30,16 +30,14 @@ class UserGenes:
         self.recentTracksDF = self.getRecentlyPlayed()
         self.topTracksDF = self.getTopTracks()
 
-         # Add columns to both data frames
+        # Add columns to both data frames
         self.recentTracksDF = self.addColumnsToDF(self.recentTracksDF)
         self.topTracksDF = self.addColumnsToDF(self.topTracksDF)
-
 
     def addColumnsToDF(self, df):
         df["inLibrary"] = self.isInLibrary(df["id"])
         df = self.mergeAudioFeatures(df)
         return df
-
 
     def getTopTracks(self, limit=50):
         topTrackIDs = []
@@ -108,7 +106,6 @@ class UserGenes:
     def mergeAudioFeatures(self, df):
         audioFeatures = self.sp.audio_features(df["id"])
         self.audioFeaturesDF = pd.DataFrame(audioFeatures)
-        self.audioFeaturesDF.to_csv("audioFeatures.csv")
         df = pd.merge(df, self.audioFeaturesDF, on="id")
 
         self.addGeneColumn(df)
@@ -229,7 +226,7 @@ class UserGenes:
         recommendationsDF = self.createTrackInfoDataFrame(
             list(pd.DataFrame(recommendations["tracks"])["id"])
         )
-        
+
         recommendationsDF = self.addColumnsToDF(recommendationsDF)
 
         return recommendationsDF
@@ -240,7 +237,14 @@ class UserGenes:
     def getRecentlyPlayedForCard(self, limit=50):
         recentTracks = (
             self.recentTracksDF[
-                ["trackName", "artistNames", "albumCoverURL", "spotifyURL", "gene", "inLibrary"]
+                [
+                    "trackName",
+                    "artistNames",
+                    "albumCoverURL",
+                    "spotifyURL",
+                    "gene",
+                    "inLibrary",
+                ]
             ]
             .drop_duplicates(subset=("trackName", "artistNames"))
             .copy()
