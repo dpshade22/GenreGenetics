@@ -5,9 +5,8 @@
     padding: 1rem;
     margin: 2rem 1rem;
     border-radius: 10px;
-    box-shadow: 0 6px 12px var(--dark-box-shadow);
+    box-shadow: 0 6px 12px var(--primary-box-shadow);
     transition: transform 0.3s, box-shadow 0.3s;
-
     height: 4.5rem;
 }
 
@@ -42,9 +41,9 @@
 .song-card:hover {
     transform: translateY(-5px);
     /* Add a slight lift effect on hover */
-    background-color: var(--off-white);
+    background-color: var(--off-primary-color);
     /* color: var(--off-white); */
-    box-shadow: 0 0px 30px var(--white);
+    box-shadow: 0 0px 30px var(--middle-box-shadow);
     /* Increase the shadow size on hover */
 }
 
@@ -90,9 +89,9 @@
 
 .gene {
     position: absolute;
-    bottom: -1.76rem;
+    bottom: -1.73rem;
     right: 0px;
-    background-color: var(--off-white);
+    background-color: var(--off-primary-color);
     /* color: var(--off-white); */
     font-size: 0.8rem !important;
     padding: 0.5rem 0.25rem;

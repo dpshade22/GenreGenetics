@@ -1,19 +1,43 @@
 /* General styles */
-/* :root {
-    --primary-color: #FFFFFF;
-    --white: #d4a373;
-    --off-white: #121212;
-    --primary-color: #E5E5E5;
-    --font-family: 'Oswald', sans-serif;
-} */
+
+
 :root {
     --primary-color: #121212;
+    --off-primary-color: #dac2c2;
     --white: #ffffff;
     --off-white: #E5E5E5;
-    --dark-box-shadow: rgba(0, 0, 0, 0.2);
-    --light-box-shadow: rgba(187, 187, 187, 0.3);
+    --primary-box-shadow: rgba(0, 0, 0, 0.4);
+    --middle-box-shadow: rgba(129, 129, 129, 1);
+    --opposing-box-shadow: rgba(187, 187, 187, 0.1);
     --font-family: 'Oswald', sans-serif;
 }
+
+
+/* ALTERNATE SCHEME */
+/* :root {
+    --primary-color: #990000;
+    --off-primary-color: #FFFF00;
+    --white: #ffffff;
+    --off-white: #FFFF00;
+    --primary-box-shadow: rgba(153, 0, 0, 0.4);
+    --opposing-box-shadow: rgba(255, 255, 255, 0.1);
+    --font-family: 'Roboto', sans-serif;
+} */
+
+/* DARK MODE */
+/* :root {
+    --primary-color: #E5E5E5;
+    --off-primary-color: #121212;
+    --white: #121212;
+    --off-white: #E5E5E5;
+    --primary-box-shadow: rgba(255, 255, 255, 0.4);
+    --opposing-box-shadow: rgba(18, 18, 18, 0.1);
+    --font-family: 'Montserrat', sans-serif;
+} */
+
+
+
+
 
 
 html,
