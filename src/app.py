@@ -14,6 +14,7 @@ from flask import (
 from flask_caching import Cache
 from spotipy.oauth2 import SpotifyOAuth
 
+from datetime import datetime
 import spotipy
 import openai
 import pandas as pd
@@ -21,85 +22,13 @@ import pymongo
 import pickle
 
 from UserGenes import UserGenes
+from functions import (
+    get_selected_dataframe,
+    get_prompt_for_gpt_music_summary,
+    get_gpt_summary_dataframe,
+    load_env_variables,
+)  # Initialize environment variables and user object
 
-
-def load_env_variables():
-    load_dotenv()
-    openai.api_key = os.environ.get("OPENAI_API_KEY")
-
-
-def init_user():
-    user = UserGenes()
-    user.initTracksDF()
-    return user
-
-
-def get_acronym_explanations():
-    return {
-        "H": "High Energy",
-        "L": "Low Energy",
-        "P": "Positive Mood",
-        "N": "Negative Mood",
-        "F": "Fast Tempo",
-        "S": "Slow Tempo",
-        "E": "Electronic Instrumentation",
-        "A": "Acoustic Instrumentation",
-    }
-
-
-def get_selected_dataframe(user):
-    df = user.recentTracksDF
-    subset = ["trackName", "artistNames"]
-
-
-    # Convert lists in the "artistNames" column to tuples or strings
-    df["artistNames"] = df["artistNames"].apply(tuple)
-
-    df = df.drop_duplicates(subset=subset)
-    return df
-
-
-def get_prompt_for_gpt_music_summary(genre=""):
-
-    return f"""
-    Your task is to create a personalized 4 sentence summary of your listener's 
-    music taste that truly resonates with them. Use your analysis of 
-    a specific number of songs to draw conclusions about their personality 
-    traits, values, and even lifestyle. Make sure to use language that is 
-    both clear and engaging, avoiding any technical jargon that could cause 
-    confusion. To create a summary that truly connects with your listener, address 
-    them directly and showcase examples of artists and songs that support your conclusions. 
-    It's important to consider factors such as the popularity of the songs and artists to determine 
-    if your listener is a mainstream or niche listener. By doing so, you'll be able to tailor your 
-    summary to their unique tastes, making it a personalized experience that they won't forget! So, 
-    let's get started and make your listener feel truly understood through the power of music.
-    """
-
-
-def get_gpt_summary_dataframe(selected_df):
-    return selected_df[
-        [
-            "trackName",
-            "trackPopularity",
-            "trackDurationMs",
-            "trackExplicit",
-            "albumName",
-            "albumType",
-            "albumReleaseDate",
-            "artistNames",
-            "artistLinks",
-            "artistGenres",
-            "artistPopularity",
-            "type",
-            "track_href",
-            "duration_ms",
-            "time_signature",
-            "gene",
-        ]
-    ][:20]
-
-
-# Initialize environment variables and user object
 load_env_variables()
 
 # Initialize the Spotify OAuth object
@@ -107,7 +36,7 @@ auth_manager = SpotifyOAuth(
     client_id=os.environ.get("SPOTIFY_CLIENT_ID"),
     client_secret=os.environ.get("SPOTIFY_CLIENT_SECRET"),
     redirect_uri=os.environ.get("SPOTIFY_REDIRECT_URI"),
-    scope='user-read-private user-read-email user-library-modify user-library-read user-top-read user-read-recently-played'
+    scope="user-read-private user-read-email user-library-modify user-library-read user-top-read user-read-recently-played",
 )
 
 # Replace the following values with your own information
@@ -117,8 +46,8 @@ client = pymongo.MongoClient(os.environ.get("MONGO_URI"))
 db = client[os.environ.get("MONGO_DB")]
 print(db)
 
-users_collection = db["Users"]
-print(users_collection)
+usersCollection = db["Users"]
+print(usersCollection)
 
 # Initialize Flask and configure Flask-Caching
 app = Flask(__name__)
@@ -131,67 +60,92 @@ cache_config = {
 app.config.from_mapping(cache_config)
 cache = Cache(app)
 
-global userDict
 
-# Updated index route
 @app.route("/", methods=["GET", "POST"])
 @cache.cached(timeout=360)
 def index():
-    global userDict
-    if "token_info" in session and auth_manager.validate_token(session["token_info"]):
+    try:
+        print(request.cookies)
+        token_info_cookie = request.cookies.get("token_info")
+        if token_info_cookie and auth_manager.validate_token(token_info_cookie):
+            print("Token info found in cookie and valid.")
+            token_info = pickle.loads(token_info_cookie.encode("latin1"))
+            user_id = token_info["user_id"]
+            print(f"User ID: {user_id}")
+            user_data = usersCollection.find_one({"spotify_id": user_id})
 
-        user = pickle.loads(session["user"])  # Deserialize the user object from the session
-        user = userDict[session["user"]]
-        selectedDF = get_selected_dataframe(user)
-        
-        promptForGPTMusicSummary = get_prompt_for_gpt_music_summary()
-        gptSummaryDF = get_gpt_summary_dataframe(selectedDF)
-        gptSummaryJSON = gptSummaryDF.to_json(orient="records")
-        topTracksSummaryText = "Test"
+            if user_data:
+                print("User data found in the database.")
 
-        sidebarCards = user.getRecentlyPlayedForCard()
+                # Use the token info from the cookie to authenticate the Spotify API client
+                auth_manager.token_info = token_info
+                sp = spotipy.Spotify(auth_manager=auth_manager)
 
-        return render_template(
-            "index.html",
-            sidebarCards=sidebarCards,
-            gptSummary=topTracksSummaryText,
+                user = UserGenes(sp)
+                selected_df = get_selected_dataframe(user)
+
+                prompt_for_gpt_music_summary = get_prompt_for_gpt_music_summary()
+                gpt_summary_df = get_gpt_summary_dataframe(selected_df)
+                gpt_summary_json = gpt_summary_df.to_json(orient="records")
+                top_tracks_summary_text = "Test"
+
+                sidebar_cards = user.getRecentlyPlayedForCard()
+
+                return render_template(
+                    "index.html",
+                    sidebar_cards=sidebar_cards,
+                    gpt_summary=top_tracks_summary_text,
+                )
+            else:
+                print("User data not found in the database.")
+                auth_url = auth_manager.get_authorize_url()
+                return render_template("index.html", auth_url=auth_url)
+        else:
+            print("Token info not found or invalid.")
+            auth_url = auth_manager.get_authorize_url()
+            return render_template("index.html", auth_url=auth_url)
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        error_message = (
+            "An error occurred while processing your request. Please try again later."
         )
-    else:
-        auth_url = auth_manager.get_authorize_url()
-        return render_template("index.html", auth_url=auth_url)
+        return render_template("index.html", error_message=error_message)
 
 
-# Callback route
 @app.route("/callback")
 def callback():
-    code = request.args.get('code')
-    # print(f"Code: {code}")  # Add this line to check the code value
-    token_info = auth_manager.get_access_token(code)
-    # print(f"Token Info: {token_info}")  # Add this line to check the token_info value
-    if token_info:
-        global userDict
-        session["token_info"] = token_info
-        auth_manager.token_info = token_info
-        sp = spotipy.Spotify(auth_manager=auth_manager)
+    try:
+        code = request.args.get("code")
+        token_info = auth_manager.get_access_token(code)
+        if token_info:
+            auth_manager.token_info = token_info
+            sp = spotipy.Spotify(auth_manager=auth_manager)
 
-        # Initialize UserGenes object with authenticated Spotify object
-        user = UserGenes(sp)
-        
-        # Store user information in the users collection
-        user_data = {
-            "spotify_id": sp.me()["id"],
-            "access_token": token_info["access_token"],
-            "refresh_token": token_info["refresh_token"],
-            "expiration_time": token_info["expires_at"],
-            # Add any additional user information that you want to store
-        }
-        users_collection.insert_one(user_data)
-        
-        return redirect(url_for("index"))
-    else:
+            # Get user's profile information
+            user_profile = sp.me()
+            user_id = user_profile["id"]
+
+            # Store the user_id in the Users collection
+            user_data = {
+                "spotify_id": user_id,
+                "access_token": token_info["access_token"],
+                "refresh_token": token_info["refresh_token"],
+                "expiration_time": token_info["expires_at"],
+                # Add any additional user information that you want to store
+            }
+            usersCollection.update_one(
+                {"spotify_id": user_id}, {"$set": user_data}, upsert=True
+            )
+
+            session["token_info"] = token_info
+
+            return redirect(url_for("index"))
+        else:
+            print("Error: Failed to get access token.")
+            return "Error: Failed to get access token", 400
+    except Exception as e:
+        print(f"Error: {e}")
         return "Error: Failed to get access token", 400
-
-
 
 
 @app.route("/about")
@@ -217,38 +171,56 @@ def favicon():
 
 @app.route("/sidebar_card_data")
 def sidebar_card_data():
-    user = pickle.loads(session["user"])
-    user = userDict[session["user"]]
-    
+    user_id = session.get("user_id")
+    if not user_id:
+        return "User not found", 404
+
+    user = usersCollection.find_one({"spotify_id": user_id})
+    if not user:
+        return "User not found", 404
+
     sidebar_cards = user.getRecentlyPlayedForCard()
     return jsonify(sidebar_cards)
 
 
 @app.route("/chart_data")
 def chart_data():
+    print("HELLO", session)
+    try:
+        user_id = session.get("user_id")
+        print(f"User ID: {user_id}")
+        print(f"Chart data...")
+        if not user_id:
+            print("User not found")
+            return "User not found", 404
 
-    if "user" not in session:
-        # Return an appropriate error message or redirect the user to the login page
-        return "User not found in session", 404
-    
-    user = pickle.loads(session["user"])
-    user = userDict[session["user"]]
+        user = usersCollection.find_one({"_id": ObjectId(user_id)})
+        print(f"User not found in db: {user}")
+        if not user:
+            return "User not found", 404
+        print(f"User found in db: {user}")
 
-    selectedDF = get_selected_dataframe(user)
-    data = user.getGeneDataFromDF(selectedDF)
+        selectedDF = get_selected_dataframe(user)
+        data = user.getGeneDataFromDF(selectedDF)
 
-    options = {}
-    return jsonify({"data": data, "options": options})
+        options = {}
+        return jsonify({"data": data, "options": options})
+    except Exception as e:
+        print(f"Error: {e}")
+        return "Error occurred", 500
 
 
 @app.route("/songs/<genre>")
 @cache.cached()
 def songs(genre):
-    user = pickle.loads(session["user"])
-    user = userDict[session["user"]]
+    token_info = request.cookies.get("token_info")
+    if not token_info:
+        return "User not found in session", 404
+
+    user_id = token_info["user_id"]
+    user = usersCollection.find_one({"spotify_id": user_id})
 
     selectedDF = get_selected_dataframe(user)
-    acronymExplanations = get_acronym_explanations()
     selectedDF = selectedDF[selectedDF["gene"] == genre]
 
     songs = selectedDF[
@@ -276,9 +248,6 @@ def songs(genre):
 
 @app.route("/generate_summary", methods=["POST"])
 def generate_summary():
-    user = pickle.loads(session["user"])
-    user = userDict[session["user"]]
-
     selectedDF = get_selected_dataframe(user)
 
     promptForGPTMusicSummary = get_prompt_for_gpt_music_summary()

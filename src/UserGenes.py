@@ -4,38 +4,52 @@ from spotipy.oauth2 import SpotifyOAuth
 from dotenv import load_dotenv
 import pandas as pd
 import pymongo
+from datetime import datetime, timedelta
 
 load_dotenv()
 
-class UserGenes:
-    def __init__(self, sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
-            scope="user-library-read user-top-read user-read-recently-played",
-            redirect_uri="http://localhost:8000/callback/",
-        ))):
 
+class UserGenes:
+    def __init__(
+        self,
+        sp=spotipy.Spotify(
+            auth_manager=SpotifyOAuth(
+                scope="user-library-read user-top-read user-read-recently-played",
+                redirect_uri="http://localhost:5000/callback/",
+            )
+        ),
+    ):
         self.sp = sp
         self.mongoClient = pymongo.MongoClient(os.environ.get("MONGO_URI"))
         self.mongoDB = self.mongoClient["SpotifyGenetics"]
-        self.recentTracksCollection = self.mongoDB["recent_tracks"]
+        self.recentTracksCollection = self.mongoDB["recentTracks"]
         self.recentTracksDF = None
         self.topTracksDF = None
         self.topTrackIDs = []
 
         self.audioFeaturesDF = None
         self.readableGenes = None
-    
+
     def isAuthenticated(self):
         token_info = self.authManager.get_cached_token()
         return self.authManager.validate_token(token_info)
 
     # Track information retrieval
     def initTracksDF(self):
-        if not self.recentTracksCollection.count_documents({}):
+        now = datetime.utcnow()
+        time_since_last_init = now - self.init_tracks_df_time
+        if time_since_last_init > timedelta(
+            minutes=30
+        ) or not self.recentTracksCollection.count_documents({}):
             self.recentTracksDF = self.getRecentlyPlayed()
-            self.recentTracksCollection.insert_many(self.recentTracksDF.to_dict('records'))
+            self.recentTracksCollection.delete_many({})
+            self.recentTracksCollection.insert_many(
+                self.recentTracksDF.to_dict("records")
+            )
+            self.init_tracks_df_time = now
         else:
             self.recentTracksDF = pd.DataFrame(self.recentTracksCollection.find())
-            
+
         self.recentTracksDF = self.addColumnsToDF(self.recentTracksDF)
 
     def addColumnsToDF(self, df):
