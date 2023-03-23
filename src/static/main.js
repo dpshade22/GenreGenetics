@@ -24,9 +24,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const chartElement = document.getElementById('myChart');
         chartElement.width = 2000;
         chartElement.height = 1200;
-        const topTracks = false;
-        console.log(`/chart_data?top_tracks=${topTracks}`)
-        const response = await fetch(`/chart_data?top_tracks=${topTracks}`);
+
+
+        const response = await fetch(`/chart_data/`);
         const chartData = await response.json();
         const data = chartData.data;
         const labels = data.map(item => item.genre);
@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function updateSidebarCards() {
         const topTracks = document.querySelector('input[name="top_tracks"]:checked').value;
-        const response = await fetch(`/sidebar_card_data?top_tracks=${topTracks}`);
+        const response = await fetch(`/sidebar_card_data`);
         const sidebarCards = await response.json();
 
         const sidebarCardContainer = document.querySelector('.recently-played-cards');
