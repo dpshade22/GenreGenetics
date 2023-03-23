@@ -4,7 +4,7 @@
 
 {% include 'head.html' %}
 
-<body style="height: 100vh; overflow: hidden;">
+<body>
     <div id="loading-screen">
         <div class="spinner"></div>
     </div>
@@ -13,6 +13,9 @@
     {% include 'navbar.html' %}
     {% endwith %} <div class="chart-container">
         <div class="chart-wrapper">
+            <!-- Add this somewhere in your index.html -->
+            <a href="{{ auth_url }}">Log in with Spotify</a>
+
             <p>{{ gptSummary }}</p>
             <canvas id="myChart"></canvas>
 

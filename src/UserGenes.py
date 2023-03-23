@@ -3,37 +3,40 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from dotenv import load_dotenv
 import pandas as pd
+import pymongo
 
 load_dotenv()
 
-
 class UserGenes:
-    def __init__(self):
-        self.authManager = SpotifyOAuth(
+    def __init__(self, sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
             scope="user-library-read user-top-read user-read-recently-played",
             redirect_uri="http://localhost:8000/callback/",
-        )
-        self.sp = spotipy.Spotify(auth_manager=self.authManager)
+        ))):
+
+        self.sp = sp
+        self.mongoClient = pymongo.MongoClient(os.environ.get("MONGO_URI"))
+        self.mongoDB = self.mongoClient["SpotifyGenetics"]
+        self.recentTracksCollection = self.mongoDB["recent_tracks"]
         self.recentTracksDF = None
         self.topTracksDF = None
         self.topTrackIDs = []
 
         self.audioFeaturesDF = None
         self.readableGenes = None
-
-    # Authentication
-    def authenticate(self):
-        self.sp = spotipy.Spotify(auth_manager=self.authManager)
+    
+    def isAuthenticated(self):
+        token_info = self.authManager.get_cached_token()
+        return self.authManager.validate_token(token_info)
 
     # Track information retrieval
     def initTracksDF(self):
-        self.recentTracksDF = self.getRecentlyPlayed()
-        self.topTracksDF = self.getTopTracks()
-
-        # Add columns to both data frames
+        if not self.recentTracksCollection.count_documents({}):
+            self.recentTracksDF = self.getRecentlyPlayed()
+            self.recentTracksCollection.insert_many(self.recentTracksDF.to_dict('records'))
+        else:
+            self.recentTracksDF = pd.DataFrame(self.recentTracksCollection.find())
+            
         self.recentTracksDF = self.addColumnsToDF(self.recentTracksDF)
-        self.topTracksDF = self.addColumnsToDF(self.topTracksDF)
-        self.recentTracksDF.to_csv("recentTracks.csv")
 
     def addColumnsToDF(self, df):
         df["inLibrary"] = self.isInLibrary(df["id"])

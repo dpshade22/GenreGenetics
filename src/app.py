@@ -1,6 +1,5 @@
 import os
 import secrets
-
 from dotenv import load_dotenv
 from flask import (
     Flask,
@@ -13,8 +12,13 @@ from flask import (
     url_for,
 )
 from flask_caching import Cache
+from spotipy.oauth2 import SpotifyOAuth
+
+import spotipy
 import openai
 import pandas as pd
+import pymongo
+import pickle
 
 from UserGenes import UserGenes
 
@@ -43,9 +47,10 @@ def get_acronym_explanations():
     }
 
 
-def get_selected_dataframe(user, top_tracks):
-    df = user.topTracksDF if top_tracks else user.recentTracksDF
+def get_selected_dataframe(user):
+    df = user.recentTracksDF
     subset = ["trackName", "artistNames"]
+
 
     # Convert lists in the "artistNames" column to tuples or strings
     df["artistNames"] = df["artistNames"].apply(tuple)
@@ -54,8 +59,8 @@ def get_selected_dataframe(user, top_tracks):
     return df
 
 
-def get_prompt_for_gpt_music_summary(top_tracks, genre=""):
-    top_or_recent = "top" if top_tracks else "recent"
+def get_prompt_for_gpt_music_summary(genre=""):
+
     return f"""
     Your task is to create a personalized 4 sentence summary of your listener's 
     music taste that truly resonates with them. Use your analysis of 
@@ -96,7 +101,24 @@ def get_gpt_summary_dataframe(selected_df):
 
 # Initialize environment variables and user object
 load_env_variables()
-user = init_user()
+
+# Initialize the Spotify OAuth object
+auth_manager = SpotifyOAuth(
+    client_id=os.environ.get("SPOTIFY_CLIENT_ID"),
+    client_secret=os.environ.get("SPOTIFY_CLIENT_SECRET"),
+    redirect_uri=os.environ.get("SPOTIFY_REDIRECT_URI"),
+    scope='user-read-private user-read-email user-library-modify user-library-read user-top-read user-read-recently-played'
+)
+
+# Replace the following values with your own information
+
+
+client = pymongo.MongoClient(os.environ.get("MONGO_URI"))
+db = client[os.environ.get("MONGO_DB")]
+print(db)
+
+users_collection = db["Users"]
+print(users_collection)
 
 # Initialize Flask and configure Flask-Caching
 app = Flask(__name__)
@@ -109,62 +131,67 @@ cache_config = {
 app.config.from_mapping(cache_config)
 cache = Cache(app)
 
+global userDict
 
-# Set global variables
-def get_top_tracks_status():
-    return False
-
-
+# Updated index route
 @app.route("/", methods=["GET", "POST"])
-@cache.cached(timeout=3600)  # Cache for 1 hour
+@cache.cached(timeout=360)
 def index():
-    session["top_tracks"] = False
-    top_tracks = get_top_tracks_status()
-    selectedDF = get_selected_dataframe(user, top_tracks)
+    global userDict
+    if "token_info" in session and auth_manager.validate_token(session["token_info"]):
 
-    if request.method == "POST":
-        top_tracks = request.form.get("top_tracks") == "True"
-        session["top_tracks"] = not top_tracks
-        return redirect(url_for("index"))
+        user = pickle.loads(session["user"])  # Deserialize the user object from the session
+        user = userDict[session["user"]]
+        selectedDF = get_selected_dataframe(user)
+        
+        promptForGPTMusicSummary = get_prompt_for_gpt_music_summary()
+        gptSummaryDF = get_gpt_summary_dataframe(selectedDF)
+        gptSummaryJSON = gptSummaryDF.to_json(orient="records")
+        topTracksSummaryText = "Test"
 
-    selectedDF = get_selected_dataframe(user, top_tracks)
-
-    promptForGPTMusicSummary = get_prompt_for_gpt_music_summary(top_tracks)
-    gptSummaryDF = get_gpt_summary_dataframe(selectedDF)
-    gptSummaryJSON = gptSummaryDF.to_json(orient="records")
-
-    # topTracksSummaryResp = openai.ChatCompletion.create(
-    #     model="gpt-3.5-turbo",
-    #     messages=[
-    #         {
-    #             "role": "system",
-    #             "content": promptForGPTMusicSummary,
-    #         },
-    #         {
-    #             "role": "user",
-    #             "content": f"Here is a list of my {'top listened to tracks' if top_tracks else 'recently listened to tracks'}{gptSummaryJSON}",
-    #         },
-    #     ],
-    # )
-    # topTracksSummaryText = topTracksSummaryResp["choices"][0]["message"]["content"]
-    topTracksSummaryText = "Test"
-
-    if not user.authManager.validate_token(user.authManager.get_cached_token()):
-        auth_url = user.authManager.get_authorize_url()
-        return redirect(auth_url)
-    else:
-        sidebarCards = (
-            user.getTopTracksForCard()
-            if top_tracks
-            else user.getRecentlyPlayedForCard()
-        )
+        sidebarCards = user.getRecentlyPlayedForCard()
 
         return render_template(
             "index.html",
-            top_tracks=top_tracks,
             sidebarCards=sidebarCards,
             gptSummary=topTracksSummaryText,
         )
+    else:
+        auth_url = auth_manager.get_authorize_url()
+        return render_template("index.html", auth_url=auth_url)
+
+
+# Callback route
+@app.route("/callback")
+def callback():
+    code = request.args.get('code')
+    # print(f"Code: {code}")  # Add this line to check the code value
+    token_info = auth_manager.get_access_token(code)
+    # print(f"Token Info: {token_info}")  # Add this line to check the token_info value
+    if token_info:
+        global userDict
+        session["token_info"] = token_info
+        auth_manager.token_info = token_info
+        sp = spotipy.Spotify(auth_manager=auth_manager)
+
+        # Initialize UserGenes object with authenticated Spotify object
+        user = UserGenes(sp)
+        
+        # Store user information in the users collection
+        user_data = {
+            "spotify_id": sp.me()["id"],
+            "access_token": token_info["access_token"],
+            "refresh_token": token_info["refresh_token"],
+            "expiration_time": token_info["expires_at"],
+            # Add any additional user information that you want to store
+        }
+        users_collection.insert_one(user_data)
+        
+        return redirect(url_for("index"))
+    else:
+        return "Error: Failed to get access token", 400
+
+
 
 
 @app.route("/about")
@@ -190,36 +217,37 @@ def favicon():
 
 @app.route("/sidebar_card_data")
 def sidebar_card_data():
-    top_tracks = request.args.get("top_tracks", "True") == "True"
-    sidebar_cards = (
-        user.getTopTracksForCard() if top_tracks else user.getRecentlyPlayedForCard()
-    )
-
+    user = pickle.loads(session["user"])
+    user = userDict[session["user"]]
+    
+    sidebar_cards = user.getRecentlyPlayedForCard()
     return jsonify(sidebar_cards)
 
 
 @app.route("/chart_data")
 def chart_data():
-    top_tracks = request.args.get("top_tracks", "True") == "True"
-    selectedDF = get_selected_dataframe(user, top_tracks)
+
+    if "user" not in session:
+        # Return an appropriate error message or redirect the user to the login page
+        return "User not found in session", 404
+    
+    user = pickle.loads(session["user"])
+    user = userDict[session["user"]]
+
+    selectedDF = get_selected_dataframe(user)
     data = user.getGeneDataFromDF(selectedDF)
 
     options = {}
     return jsonify({"data": data, "options": options})
 
 
-@app.route("/select_top_tracks", methods=["POST"])
-def select_top_tracks():
-    top_tracks = request.form.get("top_tracks") == "True"
-    session["top_tracks"] = top_tracks
-    return redirect("/")
-
-
 @app.route("/songs/<genre>")
 @cache.cached()
 def songs(genre):
-    top_tracks = get_top_tracks_status()
-    selectedDF = get_selected_dataframe(user, get_top_tracks_status())
+    user = pickle.loads(session["user"])
+    user = userDict[session["user"]]
+
+    selectedDF = get_selected_dataframe(user)
     acronymExplanations = get_acronym_explanations()
     selectedDF = selectedDF[selectedDF["gene"] == genre]
 
@@ -231,9 +259,7 @@ def songs(genre):
         selectedDF.reset_index(drop=True), seed_genre=genre
     )
 
-    promptForGPTMusicSummary = get_prompt_for_gpt_music_summary(
-        top_tracks=top_tracks, genre=genre
-    )
+    promptForGPTMusicSummary = get_prompt_for_gpt_music_summary(genre=genre)
     gptSummaryDF = get_gpt_summary_dataframe(selectedDF)
     gptSummaryJSON = gptSummaryDF.to_json(orient="records")
 
@@ -250,10 +276,12 @@ def songs(genre):
 
 @app.route("/generate_summary", methods=["POST"])
 def generate_summary():
-    top_tracks = request.form.get("top_tracks") == "True"
-    selectedDF = get_selected_dataframe(user, top_tracks)
+    user = pickle.loads(session["user"])
+    user = userDict[session["user"]]
 
-    promptForGPTMusicSummary = get_prompt_for_gpt_music_summary(top_tracks)
+    selectedDF = get_selected_dataframe(user)
+
+    promptForGPTMusicSummary = get_prompt_for_gpt_music_summary()
 
     # Construct the messages for the GPT-3.5 request
     messages = [
@@ -263,7 +291,7 @@ def generate_summary():
         },
         {
             "role": "user",
-            "content": f"Here is a list of my {'top listened to tracks' if top_tracks else 'recently listened to tracks'}",
+            "content": f"Here is a list of my recently listened to tracks",
         },
     ]
 
