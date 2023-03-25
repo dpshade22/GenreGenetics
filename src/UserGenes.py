@@ -20,9 +20,13 @@ class UserGenes:
         ),
     ):
         self.sp = sp
-        self.mongoClient = pymongo.MongoClient(os.environ.get("MONGO_URI"))
-        self.mongoDB = self.mongoClient["SpotifyGenetics"]
-        self.recentTracksCollection = self.mongoDB["recentTracks"]
+        # self.mongoClient = pymongo.MongoClient(os.environ.get("MONGO_URI"))
+        # self.mongoDB = self.mongoClient["SpotifyGenetics"]
+        # self.recentTracksCollection = self.mongoDB["recentTracks"]
+        self.authManager = SpotifyOAuth(
+                scope="user-library-read user-top-read user-read-recently-played",
+                redirect_uri="http://localhost:5000/callback/",
+            )
         self.recentTracksDF = None
         self.topTracksDF = None
         self.topTrackIDs = []
@@ -36,20 +40,7 @@ class UserGenes:
 
     # Track information retrieval
     def initTracksDF(self):
-        now = datetime.utcnow()
-        time_since_last_init = now - self.init_tracks_df_time
-        if time_since_last_init > timedelta(
-            minutes=30
-        ) or not self.recentTracksCollection.count_documents({}):
-            self.recentTracksDF = self.getRecentlyPlayed()
-            self.recentTracksCollection.delete_many({})
-            self.recentTracksCollection.insert_many(
-                self.recentTracksDF.to_dict("records")
-            )
-            self.init_tracks_df_time = now
-        else:
-            self.recentTracksDF = pd.DataFrame(self.recentTracksCollection.find())
-
+        self.recentTracksDF = self.getRecentlyPlayed()
         self.recentTracksDF = self.addColumnsToDF(self.recentTracksDF)
 
     def addColumnsToDF(self, df):

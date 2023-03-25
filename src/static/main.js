@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         chartElement.height = 1200;
 
 
-        const response = await fetch(`/chart_data/`);
+        const response = await fetch(`/chart_data`);
         const chartData = await response.json();
         const data = chartData.data;
         const labels = data.map(item => item.genre);
@@ -76,7 +76,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function updateSidebarCards() {
-        const topTracks = document.querySelector('input[name="top_tracks"]:checked').value;
         const response = await fetch(`/sidebar_card_data`);
         const sidebarCards = await response.json();
 
@@ -84,11 +83,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         sidebarCardContainer.innerHTML = '';
 
         const recentlyPlayedHeader = document.querySelector('.sidebar-container h2');
-        if (topTracks === 'True') {
-            recentlyPlayedHeader.textContent = 'Top Songs:';
-        } else {
-            recentlyPlayedHeader.textContent = 'Recently Played:';
-        }
+
+        recentlyPlayedHeader.textContent = 'Recently Played:';
+
         for (const song of sidebarCards) {
             const songCard = document.createElement('a');
             songCard.href = song.url;
@@ -153,13 +150,4 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Call the function initially to render the chart and update the sidebar cards
     await updateChartAndSidebar();
-
-    // Set up event listeners for the form
-    const form = document.getElementById('chart-form');
-
-    form.addEventListener('submit', async (event) => {
-        event.preventDefault();
-
-        await updateChartAndSidebar();
-    });
 });

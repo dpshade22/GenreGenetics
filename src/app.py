@@ -39,15 +39,8 @@ auth_manager = SpotifyOAuth(
     scope="user-read-private user-read-email user-library-modify user-library-read user-top-read user-read-recently-played",
 )
 
-# Replace the following values with your own information
-
-
-client = pymongo.MongoClient(os.environ.get("MONGO_URI"))
-db = client[os.environ.get("MONGO_DB")]
-print(db)
-
-usersCollection = db["Users"]
-print(usersCollection)
+user = UserGenes(sp=spotipy.Spotify(auth_manager=auth_manager))
+user.initTracksDF()
 
 # Initialize Flask and configure Flask-Caching
 app = Flask(__name__)
@@ -60,50 +53,39 @@ cache_config = {
 app.config.from_mapping(cache_config)
 cache = Cache(app)
 
+user_data = True
+
 
 @app.route("/", methods=["GET", "POST"])
 @cache.cached(timeout=360)
 def index():
     try:
-        print(request.cookies)
-        token_info_cookie = request.cookies.get("token_info")
-        if token_info_cookie and auth_manager.validate_token(token_info_cookie):
-            print("Token info found in cookie and valid.")
-            token_info = pickle.loads(token_info_cookie.encode("latin1"))
-            user_id = token_info["user_id"]
-            print(f"User ID: {user_id}")
-            user_data = usersCollection.find_one({"spotify_id": user_id})
+        if user_data:
+            print("User data found in the database.")
 
-            if user_data:
-                print("User data found in the database.")
+            # Use the token info from the cookie to authenticate the Spotify API client
+            sp = spotipy.Spotify(auth_manager=auth_manager)
 
-                # Use the token info from the cookie to authenticate the Spotify API client
-                auth_manager.token_info = token_info
-                sp = spotipy.Spotify(auth_manager=auth_manager)
+            user = UserGenes(sp)
+            selected_df = get_selected_dataframe(user)
 
-                user = UserGenes(sp)
-                selected_df = get_selected_dataframe(user)
+            prompt_for_gpt_music_summary = get_prompt_for_gpt_music_summary()
+            gpt_summary_df = get_gpt_summary_dataframe(selected_df)
+            gpt_summary_json = gpt_summary_df.to_json(orient="records")
+            top_tracks_summary_text = "Test"
 
-                prompt_for_gpt_music_summary = get_prompt_for_gpt_music_summary()
-                gpt_summary_df = get_gpt_summary_dataframe(selected_df)
-                gpt_summary_json = gpt_summary_df.to_json(orient="records")
-                top_tracks_summary_text = "Test"
+            sidebar_cards = user.getRecentlyPlayedForCard()
 
-                sidebar_cards = user.getRecentlyPlayedForCard()
-
-                return render_template(
-                    "index.html",
-                    sidebar_cards=sidebar_cards,
-                    gpt_summary=top_tracks_summary_text,
-                )
-            else:
-                print("User data not found in the database.")
-                auth_url = auth_manager.get_authorize_url()
-                return render_template("index.html", auth_url=auth_url)
+            return render_template(
+                "index.html",
+                sidebar_cards=sidebar_cards,
+                gpt_summary=top_tracks_summary_text,
+            )
         else:
-            print("Token info not found or invalid.")
+            print("User data not found in the database.")
             auth_url = auth_manager.get_authorize_url()
             return render_template("index.html", auth_url=auth_url)
+
     except Exception as e:
         print(f"An error occurred: {e}")
         error_message = (
@@ -118,24 +100,10 @@ def callback():
         code = request.args.get("code")
         token_info = auth_manager.get_access_token(code)
         if token_info:
-            auth_manager.token_info = token_info
             sp = spotipy.Spotify(auth_manager=auth_manager)
 
             # Get user's profile information
             user_profile = sp.me()
-            user_id = user_profile["id"]
-
-            # Store the user_id in the Users collection
-            user_data = {
-                "spotify_id": user_id,
-                "access_token": token_info["access_token"],
-                "refresh_token": token_info["refresh_token"],
-                "expiration_time": token_info["expires_at"],
-                # Add any additional user information that you want to store
-            }
-            usersCollection.update_one(
-                {"spotify_id": user_id}, {"$set": user_data}, upsert=True
-            )
 
             session["token_info"] = token_info
 
@@ -171,14 +139,6 @@ def favicon():
 
 @app.route("/sidebar_card_data")
 def sidebar_card_data():
-    user_id = session.get("user_id")
-    if not user_id:
-        return "User not found", 404
-
-    user = usersCollection.find_one({"spotify_id": user_id})
-    if not user:
-        return "User not found", 404
-
     sidebar_cards = user.getRecentlyPlayedForCard()
     return jsonify(sidebar_cards)
 
@@ -187,19 +147,6 @@ def sidebar_card_data():
 def chart_data():
     print("HELLO", session)
     try:
-        user_id = session.get("user_id")
-        print(f"User ID: {user_id}")
-        print(f"Chart data...")
-        if not user_id:
-            print("User not found")
-            return "User not found", 404
-
-        user = usersCollection.find_one({"_id": ObjectId(user_id)})
-        print(f"User not found in db: {user}")
-        if not user:
-            return "User not found", 404
-        print(f"User found in db: {user}")
-
         selectedDF = get_selected_dataframe(user)
         data = user.getGeneDataFromDF(selectedDF)
 
@@ -213,13 +160,6 @@ def chart_data():
 @app.route("/songs/<genre>")
 @cache.cached()
 def songs(genre):
-    token_info = request.cookies.get("token_info")
-    if not token_info:
-        return "User not found in session", 404
-
-    user_id = token_info["user_id"]
-    user = usersCollection.find_one({"spotify_id": user_id})
-
     selectedDF = get_selected_dataframe(user)
     selectedDF = selectedDF[selectedDF["gene"] == genre]
 
@@ -240,7 +180,6 @@ def songs(genre):
         "songs.html",
         genre=genre,
         songs=songs,
-        acronym_explanations=acronymExplanations,
         recommendations=recommendations,
         musicTasteSummary=topTracksSummaryText,
     )
