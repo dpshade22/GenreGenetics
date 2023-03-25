@@ -18,8 +18,7 @@ from datetime import datetime
 import spotipy
 import openai
 import pandas as pd
-import pymongo
-import pickle
+from functools import wraps
 
 from UserGenes import UserGenes
 from functions import (
@@ -27,7 +26,34 @@ from functions import (
     get_prompt_for_gpt_music_summary,
     get_gpt_summary_dataframe,
     load_env_variables,
-)  # Initialize environment variables and user object
+)
+
+
+def user_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if "token_info" in session:
+            token_info = session["token_info"]
+            auth_manager_with_token = SpotifyOAuth(
+                client_id=os.environ.get("SPOTIFY_CLIENT_ID"),
+                client_secret=os.environ.get("SPOTIFY_CLIENT_SECRET"),
+                redirect_uri=os.environ.get("SPOTIFY_REDIRECT_URI"),
+                scope="user-read-private user-read-email user-library-modify user-library-read user-top-read user-read-recently-played",
+            )
+            auth_manager_with_token.token_info = token_info
+
+            sp = spotipy.Spotify(auth_manager=auth_manager_with_token)
+            user = UserGenes(sp)
+            user.initTracksDF()
+            return f(user, *args, **kwargs)
+        else:
+            auth_url = auth_manager.get_authorize_url()
+            return redirect(auth_url)
+
+    return decorated_function
+
+
+# Initialize environment variables and user object
 
 load_env_variables()
 
@@ -39,8 +65,8 @@ auth_manager = SpotifyOAuth(
     scope="user-read-private user-read-email user-library-modify user-library-read user-top-read user-read-recently-played",
 )
 
-user = UserGenes(sp=spotipy.Spotify(auth_manager=auth_manager))
-user.initTracksDF()
+# user = UserGenes(sp=spotipy.Spotify(auth_manager=auth_manager))
+# user.initTracksDF()
 
 # Initialize Flask and configure Flask-Caching
 app = Flask(__name__)
@@ -53,25 +79,33 @@ cache_config = {
 app.config.from_mapping(cache_config)
 cache = Cache(app)
 
-user_data = True
-
 
 @app.route("/", methods=["GET", "POST"])
-@cache.cached(timeout=360)
+# @cache.cached(timeout=360)
 def index():
     try:
-        if user_data:
-            print("User data found in the database.")
+        if "logged_in" not in session:
+            auth_url = auth_manager.get_authorize_url()
+            return redirect(auth_url)
+        else:
+            token_info = session["token_info"]
+            auth_manager_with_token = SpotifyOAuth(
+                client_id=os.environ.get("SPOTIFY_CLIENT_ID"),
+                client_secret=os.environ.get("SPOTIFY_CLIENT_SECRET"),
+                redirect_uri=os.environ.get("SPOTIFY_REDIRECT_URI"),
+                scope="user-read-private user-read-email user-library-modify user-library-read user-top-read user-read-recently-played",
+                token_info=token_info,
+            )
 
-            # Use the token info from the cookie to authenticate the Spotify API client
-            sp = spotipy.Spotify(auth_manager=auth_manager)
-
+            sp = spotipy.Spotify(auth_manager=auth_manager_with_token)
             user = UserGenes(sp)
+            user.initTracksDF()
+
             selected_df = get_selected_dataframe(user)
 
-            prompt_for_gpt_music_summary = get_prompt_for_gpt_music_summary()
-            gpt_summary_df = get_gpt_summary_dataframe(selected_df)
-            gpt_summary_json = gpt_summary_df.to_json(orient="records")
+            # prompt_for_gpt_music_summary = get_prompt_for_gpt_music_summary()
+            # gpt_summary_df = get_gpt_summary_dataframe(selected_df)
+            # gpt_summary_json = gpt_summary_df.to_json(orient="records")
             top_tracks_summary_text = "Test"
 
             sidebar_cards = user.getRecentlyPlayedForCard()
@@ -81,10 +115,6 @@ def index():
                 sidebar_cards=sidebar_cards,
                 gpt_summary=top_tracks_summary_text,
             )
-        else:
-            print("User data not found in the database.")
-            auth_url = auth_manager.get_authorize_url()
-            return render_template("index.html", auth_url=auth_url)
 
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -103,9 +133,11 @@ def callback():
             sp = spotipy.Spotify(auth_manager=auth_manager)
 
             # Get user's profile information
-            user_profile = sp.me()
+            user = UserGenes(sp)
+            user.initTracksDF()
 
             session["token_info"] = token_info
+            session["logged_in"] = True
 
             return redirect(url_for("index"))
         else:
@@ -138,13 +170,15 @@ def favicon():
 
 
 @app.route("/sidebar_card_data")
-def sidebar_card_data():
+@user_required
+def sidebar_card_data(user):
     sidebar_cards = user.getRecentlyPlayedForCard()
     return jsonify(sidebar_cards)
 
 
 @app.route("/chart_data")
-def chart_data():
+@user_required
+def chart_data(user):
     print("HELLO", session)
     try:
         selectedDF = get_selected_dataframe(user)
@@ -159,7 +193,8 @@ def chart_data():
 
 @app.route("/songs/<genre>")
 @cache.cached()
-def songs(genre):
+@user_required
+def songs(user, genre):
     selectedDF = get_selected_dataframe(user)
     selectedDF = selectedDF[selectedDF["gene"] == genre]
 
@@ -186,6 +221,7 @@ def songs(genre):
 
 
 @app.route("/generate_summary", methods=["POST"])
+@user_required
 def generate_summary():
     selectedDF = get_selected_dataframe(user)
 
@@ -217,4 +253,4 @@ def generate_summary():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)

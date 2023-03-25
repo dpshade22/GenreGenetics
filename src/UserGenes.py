@@ -24,9 +24,9 @@ class UserGenes:
         # self.mongoDB = self.mongoClient["SpotifyGenetics"]
         # self.recentTracksCollection = self.mongoDB["recentTracks"]
         self.authManager = SpotifyOAuth(
-                scope="user-library-read user-top-read user-read-recently-played",
-                redirect_uri="http://localhost:5000/callback/",
-            )
+            scope="user-library-read user-top-read user-read-recently-played",
+            redirect_uri="http://localhost:5000/callback/",
+        )
         self.recentTracksDF = None
         self.topTracksDF = None
         self.topTrackIDs = []
@@ -283,7 +283,7 @@ class UserGenes:
                     "inLibrary",
                 ]
             ]
-            .drop_duplicates(subset=("trackName", "artistNames"))
+            .drop_duplicates(subset=("trackName", "spotifyURL"))
             .copy()
         )
         recentTracksList = recentTracks.to_dict("records")
