@@ -1,4 +1,3 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -11,69 +10,26 @@
 
     {% with title = 'Spotify Genetics' %}
     {% include 'navbar.html' %}
-    {% endwith %} <div class="chart-container">
-        <div class="chart-wrapper">
-            <!-- Add this somewhere in your index.html -->
-            <a href="{{ auth_url }}">Log in with Spotify</a>
+    {% endwith %}
+    <div class="chat-container">
+        <!-- Add this somewhere in your index.html -->
+        <a href="{{ auth_url }}">Log in with Spotify</a>
 
-            <p>{{ gptSummary }}</p>
-            <canvas id="myChart"></canvas>
+        <p>{{ gptSummary }}</p>
 
-            <div class="bottom-chart">
-                <div class="category-explanations" style="margin-top: 2rem;">
-                    <p>Click a bar to view more information about each gene</p>
-
-                    <h2>Category Explanations:</h2>
-                    <ul>
-                        <li><strong>Mood:</strong> Happy (H) / Sad (S)</li>
-                        <li><strong>Pace:</strong> Fast (F) / Slow (L)</li>
-                        <li><strong>Texture:</strong> Dense (D) / Minimal (M)</li>
-                        <li><strong>Vocals:</strong> Vocal (V) / Instrumental (I)</li>
-                    </ul>
-                </div>
-            </div>
+        <div class="message-area">
+            <!-- Messages will be appended here -->
         </div>
-        <div class="sidebar-container">
-            <h2>Recent Songs:</h2>
-            <p style="font-style: italic; color: var(--primary-color);"></p>
-            <div class="recently-played-wrapper fade-in">
-                <div class="recently-played-cards">
-                    {% for song in sidebarCards %}
-                    <a href="{{ song.url }}" target="_blank" class="song-card fade-in">
-                        <img src="{{ song.image_url }}" alt="{{ song.name }} image" class="song-image">
-                        <div class="song-card-details">
-                            <h3>{{ song.name }}</h3>
-                            <p>{{ song.artist }}</p>
-                            <p class="gene">{{ song.gene }}</p>
-                        </div>
-                    </a>
-                    {% endfor %}
 
-                </div>
-            </div>
+        <div class="chat-input-area">
+            <input type="text" id="chat-input" placeholder="Type your message...">
+            <button id="send-btn">Send</button>
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='main.js') }}" defer></script>
-    <script type="text/javascript">
-        window.addEventListener('scroll', function () {
-            var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            var windowHeight = window.innerHeight;
-            var elements = document.querySelectorAll('.fade-in');
-            var distances = [];
-
-            elements.forEach(function (element) {
-                var distance = element.offsetTop;
-                distances.push(distance);
-            });
-
-            distances.forEach(function (distance, index) {
-                if (distance < scrollTop + windowHeight) {
-                    elements[index].classList.add('is-visible');
-                }
-            });
-        });
-    </script>
+    <!-- <script src="{{ url_for('static', filename='main.js') }}" defer></script> -->
+    <script src="{{ url_for('static', filename='chat.js') }}" defer></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='chat.css') }}">
 </body>
 
 </html>
